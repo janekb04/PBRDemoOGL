@@ -93,7 +93,7 @@ STBRP_DEF int stbrp_pack_rects (stbrp_context *context, stbrp_rect *rects, int n
 // are 'num_rects' many of them.
 //
 // Rectangles which are successfully packed have the 'was_packed' flag
-// set to a non-zero value and 'x' and 'y' store the minimum location
+// set to a non-zero value and 'x' and 'y' store the minimum index
 // on each axis (i.e. bottom-left in cartesian coordinates, top-left
 // if you imagine y increasing downwards). Rectangles which do not fit
 // have the 'was_packed' flag set to 0.

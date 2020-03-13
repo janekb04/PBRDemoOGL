@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />
@@ -24,6 +25,7 @@
     <ClInclude Include="src\Texture2d.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\Utility.h" />
+    <ClInclude Include="src\VertexArray.h" />
     <ClInclude Include="src\Vendor.h" />
     <ClInclude Include="src\Viewport.h" />
     <ClInclude Include="src\Window.h" />

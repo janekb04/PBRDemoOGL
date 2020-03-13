@@ -233,9 +233,9 @@ public:
 	};
 	struct Options
 	{
-		int width;
-		int height;
-		std::string title;
+		int width = 480;
+		int height = 270;
+		std::string title = "";
 		Monitor monitor;
 		Context share;
 	};
@@ -402,7 +402,7 @@ protected: // callbacks
 	virtual void drop_callback(int count, const char** paths) {}
 
 public:	//public essential methods
-	Window(const Options& options, const CreationHints& hints = {}) :
+	Window(const Options& options = {}, const CreationHints& hints = {}) :
 		handle(create_window(*this, options, hints)),
 		context(create_context(*this, options, hints))
 	{

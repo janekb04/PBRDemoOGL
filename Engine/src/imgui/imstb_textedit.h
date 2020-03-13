@@ -361,7 +361,7 @@ typedef struct
 // result of layout query
 typedef struct
 {
-   float x0,x1;             // starting x location, end x location (allows for align=right, etc)
+   float x0,x1;             // starting x index, end x index (allows for align=right, etc)
    float baseline_y_delta;  // position of baseline relative to previous row's baseline
    float ymin,ymax;         // height of row above and below baseline
    int num_chars;
@@ -452,7 +452,7 @@ static int stb_text_locate_coord(STB_TEXTEDIT_STRING *str, float x, float y)
       return i+r.num_chars;
 }
 
-// API click: on mouse down, move the cursor to the clicked location, and reset the selection
+// API click: on mouse down, move the cursor to the clicked index, and reset the selection
 static void stb_textedit_click(STB_TEXTEDIT_STRING *str, STB_TexteditState *state, float x, float y)
 {
    // In single-line mode, just always make y = 0. This lets the drag keep working if the mouse
@@ -470,7 +470,7 @@ static void stb_textedit_click(STB_TEXTEDIT_STRING *str, STB_TexteditState *stat
    state->has_preferred_x = 0;
 }
 
-// API drag: on mouse drag, move the cursor and selection endpoint to the clicked location
+// API drag: on mouse drag, move the cursor and selection endpoint to the clicked index
 static void stb_textedit_drag(STB_TEXTEDIT_STRING *str, STB_TexteditState *state, float x, float y)
 {
    int p = 0;
@@ -511,7 +511,7 @@ typedef struct
    int prev_first;  // first char of previous row
 } StbFindState;
 
-// find the x/y location of a character, and remember info about the previous row in
+// find the x/y index of a character, and remember info about the previous row in
 // case we get a move-up event (for page up, we'll have to rescan)
 static void stb_textedit_find_charpos(StbFindState *find, STB_TEXTEDIT_STRING *str, int n, int single_line)
 {

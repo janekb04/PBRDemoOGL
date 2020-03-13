@@ -4724,7 +4724,7 @@ static void ShowExampleAppCustomRendering(bool* p_open)
 // Demonstrate using DockSpace() to create an explicit docking node within an existing window.
 // Note that you already dock windows into each others _without_ a DockSpace() by just moving windows
 // from their title bar (or by holding SHIFT if io.ConfigDockingWithShift is set).
-// DockSpace() is only useful to construct to a central location for your application.
+// DockSpace() is only useful to construct to a central index for your application.
 void ShowExampleAppDockSpace(bool* p_open)
 {
     static bool opt_fullscreen_persistant = true;

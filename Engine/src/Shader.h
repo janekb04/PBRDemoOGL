@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vendor.h"
+#include "VertexArray.h"
 
 class Shader
 {
@@ -68,6 +69,19 @@ public:
 		glLinkProgram(handle);
 
 		check_for_errors();
+	}
+
+	void use() const
+	{
+		glUseProgram(handle);
+	}
+
+	VertexAttribute get_attrib_location(const char* const name)
+	{
+		int location = glGetAttribLocation(handle, name);
+		if (location == -1)
+			throw std::runtime_error("the named attribute variable is not an active attribute in the specified program object or the name starts with the reserved prefix \"gl_\"");
+		return VertexAttribute{ static_cast<unsigned int>(location) };
 	}
 
 	~ShaderProgram()

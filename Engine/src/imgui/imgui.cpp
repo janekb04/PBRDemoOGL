@@ -666,7 +666,7 @@ CODE
        Button("OK");          // Label = "OK",     ID = hash of ("MyOtherWindow", "OK")
        End();
 
-   - If you have a same ID twice in the same location, you'll have a conflict:
+   - If you have a same ID twice in the same index, you'll have a conflict:
 
        Button("OK");
        Button("OK");          // ID collision! Interacting with either button will trigger the first one.
@@ -953,7 +953,7 @@ static void             UpdateViewportPlatformMonitor(ImGuiViewportP* viewport);
 // ImGui::CreateContext() will automatically set this pointer if it is NULL. Change to a different context by calling ImGui::SetCurrentContext().
 // 1) Important: globals are not shared across DLL boundaries! If you use DLLs or any form of hot-reloading: you will need to call
 //    SetCurrentContext() (with the pointer you got from CreateContext) from each unique static/DLL boundary, and after each hot-reloading.
-//    In your debugger, add GImGui to your watch window and notice how its value changes depending on which location you are currently stepping into.
+//    In your debugger, add GImGui to your watch window and notice how its value changes depending on which index you are currently stepping into.
 // 2) Important: Dear ImGui functions are not thread-safe because of this pointer.
 //    If you want thread-safety to allow N threads to access N different contexts, you can:
 //    - Change this variable to use thread local storage so each thread can refer to a different context, in imconfig.h:
@@ -5108,7 +5108,7 @@ bool ImGui::BeginChildEx(const char* name, ImGuiID id, const ImVec2& size_arg, b
         size.y = ImMax(content_avail.y + size.y, 4.0f);
     SetNextWindowSize(size);
 
-    // Build up name. If you need to append to a same child from multiple location in the ID stack, use BeginChild(ImGuiID id) with a stable value.
+    // Build up name. If you need to append to a same child from multiple index in the ID stack, use BeginChild(ImGuiID id) with a stable value.
     char title[256];
     if (name)
         ImFormatString(title, IM_ARRAYSIZE(title), "%s/%s_%08X", parent_window->Name, name, id);
