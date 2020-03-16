@@ -5,6 +5,7 @@
 #include "gl/VertexArray.h"
 #include "gl/Buffer.h"
 #include "Defines.h"
+#include "MultiDrawBuilder.h"
 
 void APIENTRY opengl_error_callback(
 	GLenum source,
@@ -140,33 +141,47 @@ int main()
 #endif // DEBUG
 
     ShaderProgram program{ Shader{read_file("res/sample.vert").c_str(), GL_VERTEX_SHADER}, Shader{read_file("res/sample.frag").c_str(), GL_FRAGMENT_SHADER} };
-
-    float vertices[] = {
-        //square 
-		 0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f,  // top left 
-
-		//triangle
-		 0.0f,  0.5f, 0.0f,	 // top middle
-		 0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f   // bottom left
-    };
-    unsigned int indices[] = {  // note that we start from 0!
-        //square
-		0, 1, 3,  // first Triangle
-        1, 2, 3,  // second Triangle
-
-		//triangle
-		0, 1, 2
-    };
     
     VertexArray VAO;
     Buffer VBO, EBO;
+	Buffer draw_indirect;
+	int command_count{ 0 };
+	{
+		MultiDrawElementsBuilder<glm::vec3, GLuint> builder;
+		builder.add_mesh(
+			{
+				{
+					{ 0.5f,  0.5f,  0.0f}, // top right
+					{ 0.5f, -0.5f,  0.0f}, // bottom right
+					{-0.5f, -0.5f,  0.0f}, // bottom left
+					{-0.5f,  0.5f,  0.0f}  // top left 
+				},
+				{
+					0, 1, 3, // first Triangle
+					1, 2, 3  // second Triangle
+				}
+			},
+			1
+		);
+		builder.add_mesh(
+			{
+				{
+					{ 0.0f,  0.5f,  0.0f}, // top middle
+					{ 0.5f, -0.5f,  0.0f}, // bottom right
+					{-0.5f, -0.5f,  0.0f}, // bottom left
+				},
+				{
+					0, 1, 2
+				}
+			},
+			1
+		);
 
-    VBO.data(sizeof(vertices), vertices, GL_STATIC_DRAW);
-    EBO.data(sizeof(indices), indices, GL_STATIC_DRAW);
+		VBO.data(sizeof(glm::vec3) * builder.vertices().size(), builder.vertices().data(), GL_STATIC_DRAW);
+		EBO.data(sizeof(GLuint) * builder.indices().size(), builder.indices().data(), GL_STATIC_DRAW);
+		draw_indirect.data(sizeof(glDrawElementsIndirectCommand) * builder.commands().size(), builder.commands().data(), GL_STATIC_DRAW);
+		command_count = builder.commands().size();
+	}
     
     const unsigned int VBO_IDX = 0;
     const VertexAttribute POS_IDX = program.get_attrib_location("a_pos");
@@ -174,30 +189,8 @@ int main()
     VAO.enable_attrib(POS_IDX);
     VAO.attrib_binding(POS_IDX, VBO_IDX);
     VAO.attrib_format(POS_IDX, 3, GL_FLOAT, GL_FALSE, 0);
-
-    VAO.element_buffer(EBO);
-
-	glDrawElementsIndirectCommand commands[] =
-	{
-		{
-			6,
-			1,
-			0,
-			0,
-			0
-		},
-		{
-			3,
-			1,
-			6,
-			5,
-			1
-		}
-	};
-
-	Buffer indirect;
-	indirect.data(sizeof(commands), &commands, GL_STATIC_DRAW);
-	indirect.bind(GL_DRAW_INDIRECT_BUFFER);
+    
+	VAO.element_buffer(EBO);
 
     while (!wnd.should_close())
     {
@@ -206,8 +199,9 @@ int main()
 
         program.use();
         VAO.bind();
+		draw_indirect.bind(GL_DRAW_INDIRECT_BUFFER);
 
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, sizeof(commands) / sizeof(glDrawElementsIndirectCommand), 0);
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
 
         wnd.swap_buffers();
         WindowManager::poll_events();
