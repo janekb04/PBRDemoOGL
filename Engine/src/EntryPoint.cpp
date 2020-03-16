@@ -1,17 +1,10 @@
 #include "Vendor.h"
 #include "Window.h"
-#include "Shader.h"
+#include "gl/Shader.h"
 #include "Utility.h"
-#include "VertexArray.h"
-#include "Buffer.h"
-
-typedef  struct {
-    GLuint  count;
-    GLuint  primCount;
-    GLuint  firstIndex;
-    GLuint  baseVertex;
-    GLuint  baseInstance;
-} glDrawElementsIndirectCommand;
+#include "gl/VertexArray.h"
+#include "gl/Buffer.h"
+#include "Defines.h"
 
 void APIENTRY opengl_error_callback(
 	GLenum source,
@@ -149,14 +142,24 @@ int main()
     ShaderProgram program{ Shader{read_file("res/sample.vert").c_str(), GL_VERTEX_SHADER}, Shader{read_file("res/sample.frag").c_str(), GL_FRAGMENT_SHADER} };
 
     float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
+        //square 
+		 0.5f,  0.5f, 0.0f,  // top right
          0.5f, -0.5f, 0.0f,  // bottom right
         -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
+        -0.5f,  0.5f, 0.0f,  // top left 
+
+		//triangle
+		 0.0f,  0.5f, 0.0f,	 // top middle
+		 0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f   // bottom left
     };
     unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,  // first Triangle
-        1, 2, 3   // second Triangle
+        //square
+		0, 1, 3,  // first Triangle
+        1, 2, 3,  // second Triangle
+
+		//triangle
+		0, 1, 2
     };
     
     VertexArray VAO;
@@ -177,11 +180,18 @@ int main()
 	glDrawElementsIndirectCommand commands[] =
 	{
 		{
-			sizeof(indices) / sizeof(unsigned int),
+			6,
 			1,
 			0,
 			0,
 			0
+		},
+		{
+			3,
+			1,
+			6,
+			5,
+			1
 		}
 	};
 

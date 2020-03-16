@@ -11,8 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Buffer.h" />
+    <ClInclude Include="src\gl\Buffer.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Defines.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />
     <ClInclude Include="src\imgui\imgui_impl_glfw.h" />
@@ -21,11 +22,12 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\Texture2d.h" />
+    <ClInclude Include="src\gl\Shader.h" />
+    <ClInclude Include="src\gl\Texture2d.h" />
+    <ClInclude Include="src\MultiDrawBuilder.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\Utility.h" />
-    <ClInclude Include="src\VertexArray.h" />
+    <ClInclude Include="src\gl\VertexArray.h" />
     <ClInclude Include="src\Vendor.h" />
     <ClInclude Include="src\Viewport.h" />
     <ClInclude Include="src\Window.h" />
