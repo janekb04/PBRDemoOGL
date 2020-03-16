@@ -46,10 +46,10 @@
     <ClCompile Include="src\stb_image_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\sample.frag">
+    <None Include="res\lit.frag">
       <FileType>Document</FileType>
     </None>
-    <None Include="res\sample.vert">
+    <None Include="res\lit.vert">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

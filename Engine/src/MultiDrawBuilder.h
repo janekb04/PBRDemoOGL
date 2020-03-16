@@ -12,29 +12,23 @@ private:
 	std::vector<glDrawElementsIndirectCommand> m_commands;
 	unsigned m_instances;
 public:
-	struct Mesh
-	{
-		std::vector<Vertex> vertices;
-		std::vector<Index> indices;
-	};
-public:
 	MultiDrawElementsBuilder() :
 		m_instances(0)
 	{
 	}
 
-	void add_mesh(const Mesh& mesh, unsigned instances)
+	void add_mesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, unsigned instances)
 	{
 		glDrawElementsIndirectCommand cmd;
-		cmd.count = mesh.indices.size();
+		cmd.count = indices.size();
 		cmd.primCount = instances;
 		cmd.firstIndex = m_indices.size();
 		cmd.baseVertex = m_vertices.size();
 		cmd.baseInstance = m_instances;
 
 		m_commands.push_back(cmd);
-		m_vertices.insert(m_vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
-		m_indices.insert(m_indices.end(), mesh.indices.begin(), mesh.indices.end());
+		m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
+		m_indices.insert(m_indices.end(), indices.begin(), indices.end());
 		m_instances += instances;
 	}
 

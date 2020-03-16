@@ -141,8 +141,8 @@ int main()
 #endif // DEBUG
 
     ShaderProgram program{
-		Shader{read_file("res/sample.vert").c_str(), GL_VERTEX_SHADER},
-		Shader{read_file("res/sample.frag").c_str(), GL_FRAGMENT_SHADER}
+		Shader{read_file("res/lit.vert").c_str(), GL_VERTEX_SHADER},
+		Shader{read_file("res/lit.frag").c_str(), GL_FRAGMENT_SHADER}
 	};
     
     Buffer VBO, EBO;
@@ -152,29 +152,25 @@ int main()
 		MultiDrawElementsBuilder<glm::vec3, GLuint> builder;
 		builder.add_mesh(
 			{
-				{
-					{ 0.5f,  0.5f,  0.0f}, // top right
-					{ 0.5f, -0.5f,  0.0f}, // bottom right
-					{-0.5f, -0.5f,  0.0f}, // bottom left
-					{-0.5f,  0.5f,  0.0f}  // top left 
-				},
-				{
-					0, 1, 3, // first Triangle
-					1, 2, 3  // second Triangle
-				}
+				{ 0.5f,  0.5f,  0.0f}, // top right
+				{ 0.5f, -0.5f,  0.0f}, // bottom right
+				{-0.5f, -0.5f,  0.0f}, // bottom left
+				{-0.5f,  0.5f,  0.0f}  // top left 
+			},
+			{
+				0, 1, 3, // first Triangle
+				1, 2, 3  // second Triangle
 			},
 			1
 		);
 		builder.add_mesh(
 			{
-				{
-					{ 0.0f,  0.5f,  0.0f}, // top middle
-					{ 0.5f, -0.5f,  0.0f}, // bottom right
-					{-0.5f, -0.5f,  0.0f}, // bottom left
-				},
-				{
-					0, 1, 2
-				}
+				{ 0.0f,  0.5f,  0.0f}, // top middle
+				{ 0.5f, -0.5f,  0.0f}, // bottom right
+				{-0.5f, -0.5f,  0.0f}, // bottom left
+			},
+			{
+				0, 1, 2
 			},
 			1
 		);
