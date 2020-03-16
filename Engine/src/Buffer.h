@@ -28,6 +28,11 @@ public:
 		return handle;
 	}
 
+	void bind(GLenum target) const
+	{
+		glBindBuffer(target, handle);
+	}
+
 	~Buffer()
 	{
 		glDeleteBuffers(1, &handle);

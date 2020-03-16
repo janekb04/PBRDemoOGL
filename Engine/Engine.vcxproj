@@ -40,6 +40,14 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\stb_image_impl.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\sample.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="res\sample.vert">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{45C9F3D8-E081-433A-A2EB-1F2FFEEDFFE4}</ProjectGuid>
