@@ -46,6 +46,8 @@ public:
 		};
 		glTextureSubImage2D(handle, 0, 0, 0, width, height, formats[channels - 1], GL_UNSIGNED_BYTE, data);
 
+		stbi_image_free(data);
+
 		return Texture2d(handle);
 	}
 
