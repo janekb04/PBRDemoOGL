@@ -140,9 +140,11 @@ int main()
 	glDebugMessageCallback(opengl_error_callback, NULL);
 #endif // DEBUG
 
-    ShaderProgram program{ Shader{read_file("res/sample.vert").c_str(), GL_VERTEX_SHADER}, Shader{read_file("res/sample.frag").c_str(), GL_FRAGMENT_SHADER} };
+    ShaderProgram program{
+		Shader{read_file("res/sample.vert").c_str(), GL_VERTEX_SHADER},
+		Shader{read_file("res/sample.frag").c_str(), GL_FRAGMENT_SHADER}
+	};
     
-    VertexArray VAO;
     Buffer VBO, EBO;
 	Buffer draw_indirect;
 	int command_count{ 0 };
@@ -183,7 +185,8 @@ int main()
 		command_count = builder.commands().size();
 	}
     
-    const unsigned int VBO_IDX = 0;
+	VertexArray VAO;
+	const unsigned int VBO_IDX = 0;
     const VertexAttribute POS_IDX = program.get_attrib_location("a_pos");
     VAO.vertex_buffer(VBO_IDX, VBO, 0, 3 * sizeof(float));
     VAO.enable_attrib(POS_IDX);

@@ -25,6 +25,9 @@
     <ClInclude Include="src\gl\Shader.h" />
     <ClInclude Include="src\gl\Texture2d.h" />
     <ClInclude Include="src\MultiDrawBuilder.h" />
+    <ClInclude Include="src\scene\Index.h" />
+    <ClInclude Include="src\scene\Mesh.h" />
+    <ClInclude Include="src\scene\Vertex.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\gl\VertexArray.h" />
