@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl\Buffer.h" />
-    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\scene\Camera.h" />
     <ClInclude Include="src\Defines.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />
@@ -28,11 +28,12 @@
     <ClInclude Include="src\scene\Index.h" />
     <ClInclude Include="src\scene\Mesh.h" />
     <ClInclude Include="src\scene\Vertex.h" />
-    <ClInclude Include="src\Transform.h" />
+    <ClInclude Include="src\scene\Transform.h" />
+    <ClInclude Include="src\scene\World.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\gl\VertexArray.h" />
     <ClInclude Include="src\Vendor.h" />
-    <ClInclude Include="src\Viewport.h" />
+    <ClInclude Include="src\scene\Viewport.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
