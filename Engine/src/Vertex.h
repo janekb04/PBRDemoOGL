@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Vendor.h"
+#include "Vendor.h"
 
 struct Vertex
 {

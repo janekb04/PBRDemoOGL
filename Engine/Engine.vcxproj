@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\gl\Buffer.h" />
-    <ClInclude Include="src\scene\Camera.h" />
+    <ClInclude Include="src\Buffer.h" />
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Defines.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />
@@ -22,18 +22,18 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\gl\Shader.h" />
-    <ClInclude Include="src\gl\Texture2d.h" />
+    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Texture2d.h" />
     <ClInclude Include="src\MultiDrawBuilder.h" />
-    <ClInclude Include="src\scene\Index.h" />
-    <ClInclude Include="src\scene\Mesh.h" />
-    <ClInclude Include="src\scene\Vertex.h" />
-    <ClInclude Include="src\scene\Transform.h" />
-    <ClInclude Include="src\scene\World.h" />
+    <ClInclude Include="src\Index.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Vertex.h" />
+    <ClInclude Include="src\Transform.h" />
+    <ClInclude Include="src\World.h" />
     <ClInclude Include="src\Utility.h" />
-    <ClInclude Include="src\gl\VertexArray.h" />
+    <ClInclude Include="src\VertexArray.h" />
     <ClInclude Include="src\Vendor.h" />
-    <ClInclude Include="src\scene\Viewport.h" />
+    <ClInclude Include="src\Viewport.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>

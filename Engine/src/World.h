@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Vendor.h"
+#include "Vendor.h"
 #include "Mesh.h"
-#include "../gl/VertexArray.h"
-#include "../gl/Buffer.h"
-#include "../gl/Texture2d.h"
+#include "VertexArray.h"
+#include "Buffer.h"
+#include "Texture2d.h"
 
 class World
 {

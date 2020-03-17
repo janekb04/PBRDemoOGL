@@ -1,13 +1,13 @@
 #include "Vendor.h"
 #include "Window.h"
-#include "gl/Shader.h"
+#include "Shader.h"
 #include "Utility.h"
-#include "gl/VertexArray.h"
-#include "gl/Buffer.h"
+#include "VertexArray.h"
+#include "Buffer.h"
 #include "Defines.h"
 #include "MultiDrawBuilder.h"
-#include "scene/Vertex.h"
-#include "scene/Camera.h"
+#include "Vertex.h"
+#include "Camera.h"
 
 void APIENTRY opengl_error_callback(
 	GLenum source,
