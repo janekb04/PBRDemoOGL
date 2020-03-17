@@ -8,6 +8,7 @@ public:
 	glm::uvec2 offset;
 	glm::uvec2 size;
 public:
+
 	template <typename FloatT>
 	FloatT aspect() const
 	{

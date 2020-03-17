@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Vendor.h"
-#include "../Viewport.h"
-#include "../Transform.h"
+#include "Vendor.h"
+#include "Viewport.h"
+#include "Transform.h"
 
 struct PerspectiveCamera
 {

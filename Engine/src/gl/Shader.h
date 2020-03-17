@@ -40,6 +40,22 @@ public:
 	}
 };
 
+class Uniform
+{
+private:
+	GLuint m_index;
+public:
+	explicit Uniform(unsigned int location) :
+		m_index{ location }
+	{
+	}
+
+	unsigned int index() const
+	{
+		return m_index;
+	}
+};
+
 class ShaderProgram
 {
 private:
@@ -76,12 +92,23 @@ public:
 		glUseProgram(handle);
 	}
 
+	void uniform(Uniform uniform, bool transpose, const glm::mat4& matrix) const
+	{
+		glProgramUniformMatrix4fv(handle, uniform.index(), 1, transpose, glm::value_ptr(matrix));
+	}
+
 	VertexAttribute get_attrib_location(const char* const name)
 	{
 		int location = glGetAttribLocation(handle, name);
-		if (location == -1)
-			throw std::runtime_error("the named attribute variable is not an active attribute in the specified program object or the name starts with the reserved prefix \"gl_\"");
+		assert(location != -1);
 		return VertexAttribute{ static_cast<unsigned int>(location) };
+	}
+
+	Uniform get_uniform_location(const char* const name)
+	{
+		int location = glGetUniformLocation(handle, name);
+		assert(location != -1);
+		return Uniform{ static_cast<unsigned int>(location) };
 	}
 
 	~ShaderProgram()

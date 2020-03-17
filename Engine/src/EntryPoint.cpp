@@ -6,6 +6,8 @@
 #include "gl/Buffer.h"
 #include "Defines.h"
 #include "MultiDrawBuilder.h"
+#include "scene/Vertex.h"
+#include "scene/Camera.h"
 
 void APIENTRY opengl_error_callback(
 	GLenum source,
@@ -140,7 +142,7 @@ int main()
 	glDebugMessageCallback(opengl_error_callback, NULL);
 #endif // DEBUG
 
-    ShaderProgram program{
+    ShaderProgram lit{
 		Shader{read_file("res/lit.vert").c_str(), GL_VERTEX_SHADER},
 		Shader{read_file("res/lit.frag").c_str(), GL_FRAGMENT_SHADER}
 	};
@@ -183,23 +185,46 @@ int main()
     
 	VertexArray VAO;
 	const unsigned int VBO_IDX = 0;
-    const VertexAttribute POS_IDX = program.get_attrib_location("a_pos");
-    VAO.vertex_buffer(VBO_IDX, VBO, 0, 3 * sizeof(float));
+    //VAO.vertex_buffer(VBO_IDX, VBO, 0, sizeof(Vertex));
+    VAO.vertex_buffer(VBO_IDX, VBO, 0, sizeof(glm::vec3));
+	VAO.element_buffer(EBO);
+    
+	const VertexAttribute POS_IDX = lit.get_attrib_location("a_pos");
+    //const VertexAttribute NORMAL_IDX = lit.get_attrib_location("a_normal");
+    //const VertexAttribute UV_IDX = lit.get_attrib_location("a_uv");
+    //const VertexAttribute TANGENT_IDX = lit.get_attrib_location("a_tangent");
+
     VAO.enable_attrib(POS_IDX);
     VAO.attrib_binding(POS_IDX, VBO_IDX);
-    VAO.attrib_format(POS_IDX, 3, GL_FLOAT, GL_FALSE, 0);
-    
-	VAO.element_buffer(EBO);
+    VAO.attrib_format(POS_IDX, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
+
+	//VAO.enable_attrib(NORMAL_IDX);
+	//VAO.attrib_binding(NORMAL_IDX, VBO_IDX);
+	//VAO.attrib_format(NORMAL_IDX, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
+
+	//VAO.enable_attrib(UV_IDX);
+	//VAO.attrib_binding(UV_IDX, VBO_IDX);
+	//VAO.attrib_format(UV_IDX, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, uv));
+
+	//VAO.enable_attrib(TANGENT_IDX);
+	//VAO.attrib_binding(TANGENT_IDX, VBO_IDX);
+	//VAO.attrib_format(TANGENT_IDX, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, tangent));
+
+	PerspectiveCamera camera;
+	camera.transform.set_position({ 0, 0, -1 });
+	Viewport viewport{ {0,0}, {wnd.get_framebuffer_size().first, wnd.get_framebuffer_size().second} };
+	Uniform camera_mat = lit.get_uniform_location("a_camera");
 
     while (!wnd.should_close())
     {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        program.use();
+        lit.use();
+		lit.uniform(camera_mat, false, camera.get_projection_matrix(viewport) * camera.get_view_matrix());
+
         VAO.bind();
 		draw_indirect.bind(GL_DRAW_INDIRECT_BUFFER);
-
 		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
 
         wnd.swap_buffers();
