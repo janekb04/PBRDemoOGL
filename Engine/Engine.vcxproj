@@ -44,6 +44,7 @@
     <ClCompile Include="src\imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\newmain.cpp" />
     <ClCompile Include="src\stb_image_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
