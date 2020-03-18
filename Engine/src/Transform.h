@@ -50,42 +50,50 @@ public:
 	}
 
 public:
-	const inline glm::mat4& to_mat4() const
+	glm::mat4 to_mat4() const
 	{
 		return trans;
 	}
-	const inline glm::vec3& get_position() const
+	glm::vec3 get_position() const
 	{
 		return trans[3];
 	}
-	void inline set_position(const glm::vec3 pos)
+	void set_position(const glm::vec3 pos)
 	{
 		make_trans_matrix(pos, trans);
 	}
-	const inline glm::quat& get_orientation() const
+	glm::quat get_orientation() const
 	{
 		return orientation;
 	}
-	void inline set_orientation(const glm::quat& rot)
+	void set_orientation(const glm::quat& rot)
 	{
 		orientation = rot;
 		make_rot_matrix(orientation, scale, trans);
 	}
-	void inline set_orientation(const glm::vec3& euler)
+	void set_orientation(const glm::vec3& euler)
 	{
 		set_orientation(glm::quat(euler));
 	}
-	const inline glm::vec3& get_scale() const
+	glm::vec3 get_scale() const
 	{
 		return scale;
 	}
-	void inline set_scale(const glm::vec3& scl)
+	void set_scale(const glm::vec3& scl)
 	{
 		glm::vec3 factor = scl / scale;
 		scale = scl;
 		trans[0] *= factor.x;
 		trans[1] *= factor.y;
 		trans[2] *= factor.z;
+	}
+	void translate(const glm::vec3& translation)
+	{
+		set_position(get_position() + translation);
+	}
+	void rotate(const glm::quat& rotation)
+	{
+		set_orientation(get_orientation() * rotation);
 	}
 public:
 	static const Transform ORIGIN;

@@ -8,139 +8,12 @@
 #include "MultiDrawBuilder.h"
 #include "Vertex.h"
 #include "Camera.h"
-
-void APIENTRY opengl_error_callback(
-	GLenum source,
-	GLenum type,
-	GLuint id,
-	GLenum severity,
-	GLsizei length,
-	const GLchar* msg,
-	const void* data
-) {
-	char message[BUFSIZ];
-
-	const char* _source;
-	const char* _type;
-	const char* _severity;
-
-	switch (source) {
-	case GL_DEBUG_SOURCE_API:
-		_source = "API";
-		break;
-
-	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-		_source = "WINDOW_SYSTEM";
-		break;
-
-	case GL_DEBUG_SOURCE_SHADER_COMPILER:
-		_source = "SHADER_COMPILER";
-		break;
-
-	case GL_DEBUG_SOURCE_THIRD_PARTY:
-		_source = "THIRD_PARTY";
-		break;
-
-	case GL_DEBUG_SOURCE_APPLICATION:
-		_source = "APPLICATION";
-		break;
-
-	case GL_DEBUG_SOURCE_OTHER:
-		_source = "OTHER";
-		break;
-
-	default:
-		_source = "UNKNOWN";
-		break;
-	}
-
-	switch (type) {
-	case GL_DEBUG_TYPE_ERROR:
-		_type = "ERROR";
-		break;
-
-	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		_type = "DEPRECATED_BEHAVIOR";
-		break;
-
-	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		_type = "UDEFINED_BEHAVIOR";
-		break;
-
-	case GL_DEBUG_TYPE_PORTABILITY:
-		_type = "PORTABILITY";
-		break;
-
-	case GL_DEBUG_TYPE_PERFORMANCE:
-		_type = "PERFORMANCE";
-		break;
-
-	case GL_DEBUG_TYPE_OTHER:
-		_type = "OTHER";
-		break;
-
-	case GL_DEBUG_TYPE_MARKER:
-		_type = "MARKER";
-		break;
-
-	default:
-		_type = "UNKNOWN";
-		break;
-	}
-
-	switch (severity) {
-	case GL_DEBUG_SEVERITY_HIGH:
-		_severity = "HIGH";
-		break;
-
-	case GL_DEBUG_SEVERITY_MEDIUM:
-		_severity = "MEDIUM";
-		break;
-
-	case GL_DEBUG_SEVERITY_LOW:
-		_severity = "LOW";
-		break;
-
-	case GL_DEBUG_SEVERITY_NOTIFICATION:
-		_severity = "NOTIFICATION";
-		break;
-
-	default:
-		_severity = "UNKNOWN";
-		break;
-	}
-
-	std::snprintf(message, BUFSIZ, "%s (%d) of %s severity, raised from %s: %s\n", _type, id, _severity, _source, msg);
-
-	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
-		throw std::runtime_error(message);
-}
+#include "OpenGLWindow.h"
 
 int main()
 {
     WindowManager::init();
-    Window::CreationHints hints;
-    hints.context_version_major = 4;
-    hints.context_version_minor = 6;
-    hints.opengl_profile = Window::OpenGLProfile::CORE;
-#ifndef NDEBUG
-	hints.opengl_debug_context = true;
-#endif // !NDEBUG
-
-	Window wnd{ {}, hints };
-    
-    wnd.get_context().make_current();
-
-    if (glewInit() != GLEW_OK)
-    {
-        std::cout << "Failed to initialize GLEW" << std::endl;
-        return -1;
-    }
-
-#ifndef NDEBUG
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glDebugMessageCallback(opengl_error_callback, NULL);
-#endif // DEBUG
+	OpenGLWindow wnd;
 
     ShaderProgram lit{
 		Shader{read_file("res/lit.vert").c_str(), GL_VERTEX_SHADER},
@@ -232,22 +105,50 @@ int main()
     
 	PerspectiveCamera camera;
 	camera.transform.set_position({ 0, 0, -1 });
-	Viewport viewport{ {0,0}, {wnd.get_framebuffer_size().first, wnd.get_framebuffer_size().second} };
 	Uniform camera_mat = lit.get_uniform_location("a_camera");
+    
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
+	double old_time = WindowManager::get_time();
+	double delta_time = 0;
     while (!wnd.should_close())
     {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        lit.use();
-		lit.uniform(camera_mat, false, camera.get_projection_matrix(viewport) * camera.get_view_matrix());
+		//update
+		{
+			glm::vec3 move{ 0, 0, 0 };
+			if (wnd.is_key_pressed(GLFW_KEY_W))
+				move += glm::vec3{ 0, 0, 1 };
+			if (wnd.is_key_pressed(GLFW_KEY_S))
+				move += glm::vec3{ 0, 0, -1 };
+			if (wnd.is_key_pressed(GLFW_KEY_A))
+				move += glm::vec3{ 1, 0, 0 };
+			if (wnd.is_key_pressed(GLFW_KEY_D))
+				move += glm::vec3{ -1, 0, 0 };
+			
+			if (glm::length(move) != 0)
+				move = glm::normalize(move);
+			const float speed = 5;
+			move *= speed * delta_time;
+			camera.transform.translate(move);
+		}
 
-        VAO.bind();
-		draw_indirect.bind(GL_DRAW_INDIRECT_BUFFER);
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
+		//draw
+		{
+			lit.use();
+			lit.uniform(camera_mat, false, camera.get_projection_matrix(wnd.viewport()) * camera.get_view_matrix());
+
+			VAO.bind();
+			draw_indirect.bind(GL_DRAW_INDIRECT_BUFFER);
+			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
+		}
 
         wnd.swap_buffers();
         WindowManager::poll_events();
-    }
+		
+		double new_time = WindowManager::get_time();
+		delta_time = new_time - old_time;
+		old_time = new_time;
+	}
 }

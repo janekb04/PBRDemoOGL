@@ -146,6 +146,10 @@ public:
 		force_main_thread("WindowManager::terminate");
 		glfwTerminate();
 	}
+	static double get_time()
+	{
+		return glfwGetTime();
+	}
 public:
 	static constexpr int DONT_CARE = GLFW_DONT_CARE;
 };
