@@ -37,7 +37,7 @@ int main()
 				0, 1, 3, // first Triangle
 				1, 2, 3  // second Triangle
 			},
-			1
+			50
 		);
 		builder.add_mesh(
 			{
@@ -48,7 +48,7 @@ int main()
 			{
 				0, 1, 2
 			},
-			1
+			50
 		);
 
 		VBO.data(sizeof(glm::vec3) * builder.vertices().size(), builder.vertices().data(), GL_STATIC_DRAW);
@@ -56,12 +56,14 @@ int main()
 		draw_indirect.data(sizeof(glDrawElementsIndirectCommand) * builder.commands().size(), builder.commands().data(), GL_STATIC_DRAW);
 		command_count = builder.commands().size();
 
-		glm::mat4 tranforms[] = {
-			glm::mat4(1),
-			glm::mat4(1)
-		};
+		std::vector<glm::mat4> transforms(builder.instances());
+		unsigned side_length = ceil(sqrt(transforms.size()));
+		for (int i = 0; i < transforms.size(); ++i)
+		{
+			transforms[i] = glm::translate(glm::mat4(1), glm::vec3(i / side_length, i % side_length, 0));
+		}
 
-		instanced_vbo.data(sizeof(tranforms), glm::value_ptr(tranforms[0]), GL_STATIC_DRAW);
+		instanced_vbo.data(transforms.size() * sizeof(glm::mat4), glm::value_ptr(*transforms.data()), GL_STATIC_DRAW);
 	}
     
 	VertexArray VAO;
@@ -126,6 +128,10 @@ int main()
 				move += glm::vec3{ 1, 0, 0 };
 			if (wnd.is_key_pressed(GLFW_KEY_D))
 				move += glm::vec3{ -1, 0, 0 };
+			if (wnd.is_key_pressed(GLFW_KEY_R))
+				move += glm::vec3{ 0, -1, 0 };
+			if (wnd.is_key_pressed(GLFW_KEY_F))
+				move += glm::vec3{ 0, 1, 0 };
 			
 			if (glm::length(move) != 0)
 				move = glm::normalize(move);
