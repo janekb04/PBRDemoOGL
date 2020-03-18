@@ -46,4 +46,9 @@ public:
 	{
 		return m_commands;
 	}
+
+	unsigned instances() const
+	{
+		return m_instances;
+	}
 };

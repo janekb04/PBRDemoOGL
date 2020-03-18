@@ -149,6 +149,7 @@ int main()
     
     Buffer VBO, EBO;
 	Buffer draw_indirect;
+	Buffer instanced_vbo;
 	int command_count{ 0 };
 	{
 		MultiDrawElementsBuilder<glm::vec3, GLuint> builder;
@@ -181,14 +182,19 @@ int main()
 		EBO.data(sizeof(GLuint) * builder.indices().size(), builder.indices().data(), GL_STATIC_DRAW);
 		draw_indirect.data(sizeof(glDrawElementsIndirectCommand) * builder.commands().size(), builder.commands().data(), GL_STATIC_DRAW);
 		command_count = builder.commands().size();
+
+		glm::mat4 tranforms[] = {
+			glm::mat4(1),
+			glm::mat4(1)
+		};
+
+		instanced_vbo.data(sizeof(tranforms), glm::value_ptr(tranforms[0]), GL_STATIC_DRAW);
 	}
     
 	VertexArray VAO;
+	
 	const unsigned int VBO_IDX = 0;
-    //VAO.vertex_buffer(VBO_IDX, VBO, 0, sizeof(Vertex));
-    VAO.vertex_buffer(VBO_IDX, VBO, 0, sizeof(glm::vec3));
-	VAO.element_buffer(EBO);
-    
+    VAO.vertex_buffer(VBO_IDX, VBO, 0, sizeof(glm::vec3)); //VAO.vertex_buffer(VBO_IDX, VBO, 0, sizeof(Vertex));
 	const VertexAttribute POS_IDX = lit.get_attrib_location("a_pos");
     //const VertexAttribute NORMAL_IDX = lit.get_attrib_location("a_normal");
     //const VertexAttribute UV_IDX = lit.get_attrib_location("a_uv");
@@ -210,6 +216,19 @@ int main()
 	//VAO.attrib_binding(TANGENT_IDX, VBO_IDX);
 	//VAO.attrib_format(TANGENT_IDX, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, tangent));
 
+	const unsigned int INSTANCED_VBO_IDX = 1;
+	VAO.vertex_buffer(INSTANCED_VBO_IDX, instanced_vbo, 0, sizeof(glm::mat4));
+	const VertexAttribute MODEL_IDX = lit.get_attrib_location("a_model");
+	for (int i = 0; i < 4; ++i)
+	{
+		VertexAttribute column{ MODEL_IDX.index() + i };
+		VAO.enable_attrib(column);
+		VAO.attrib_binding(column, INSTANCED_VBO_IDX);
+		VAO.attrib_format(column, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4) * i);
+	}
+
+	VAO.element_buffer(EBO);
+    
 	PerspectiveCamera camera;
 	camera.transform.set_position({ 0, 0, -1 });
 	Viewport viewport{ {0,0}, {wnd.get_framebuffer_size().first, wnd.get_framebuffer_size().second} };
