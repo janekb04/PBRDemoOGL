@@ -41,12 +41,22 @@ int main()
 		);
 		builder.add_mesh(
 			{
-				{ 0.0f,  0.5f,  0.0f}, // top middle
-				{ 0.5f, -0.5f,  0.0f}, // bottom right
-				{-0.5f, -0.5f,  0.0f}, // bottom left
+				{-1, -1, -1},
+				{1, -1, -1},
+				{1, 1, -1},
+				{-1, 1, -1},
+				{-1, -1, 1},
+				{1, -1, 1},
+				{1, 1, 1},
+				{-1, 1, 1}
 			},
 			{
-				0, 1, 2
+				0, 1, 3, 3, 1, 2,
+				1, 5, 2, 2, 5, 6,
+				5, 4, 6, 6, 4, 7,
+				4, 0, 7, 7, 0, 3,
+				3, 2, 7, 7, 2, 6,
+				4, 5, 0, 0, 5, 1
 			},
 			50
 		);
@@ -110,12 +120,13 @@ int main()
 	Uniform camera_mat = lit.get_uniform_location("a_camera");
     
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
 
 	double old_time = WindowManager::get_time();
 	double delta_time = 0;
     while (!wnd.should_close())
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//update
 		{
