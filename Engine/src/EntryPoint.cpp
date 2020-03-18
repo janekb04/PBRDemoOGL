@@ -218,13 +218,14 @@ int main()
 
 	const unsigned int INSTANCED_VBO_IDX = 1;
 	VAO.vertex_buffer(INSTANCED_VBO_IDX, instanced_vbo, 0, sizeof(glm::mat4));
+	VAO.binding_divisor(INSTANCED_VBO_IDX, 1);
 	const VertexAttribute MODEL_IDX = lit.get_attrib_location("a_model");
 	for (int i = 0; i < 4; ++i)
 	{
 		VertexAttribute column{ MODEL_IDX.index() + i };
 		VAO.enable_attrib(column);
 		VAO.attrib_binding(column, INSTANCED_VBO_IDX);
-		VAO.attrib_format(column, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4) * i);
+		VAO.attrib_format(column, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4::col_type) * i);
 	}
 
 	VAO.element_buffer(EBO);

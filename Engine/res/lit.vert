@@ -13,4 +13,5 @@ uniform mat4 a_camera;
 void main()
 {
 	gl_Position = a_camera * a_model * vec4(a_pos, 1);
+	v_color = vec4(gl_DrawID, 0, 0, 1);
 }
