@@ -33,6 +33,11 @@ public:
 		glBindBuffer(target, handle);
 	}
 
+	void bind_base(GLenum target, unsigned index)
+	{
+		glBindBufferBase(target, index, handle);
+	}
+
 	~Buffer()
 	{
 		glDeleteBuffers(1, &handle);

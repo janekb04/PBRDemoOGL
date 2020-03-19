@@ -5,8 +5,6 @@
 #include "VertexArray.h"
 #include "Buffer.h"
 #include "Defines.h"
-#include "MultiDrawBuilder.h"
-#include "Vertex.h"
 #include "Camera.h"
 #include "OpenGLWindow.h"
 #include "DemoScene.h"
@@ -15,6 +13,11 @@ int main()
 {
     WindowManager::init();
 	OpenGLWindow wnd;
+
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
     ShaderProgram lit{
 		Shader{read_file("res/lit.vert").c_str(), GL_VERTEX_SHADER},
@@ -26,9 +29,6 @@ int main()
 	PerspectiveCamera camera;
 	camera.transform.set_position({ 0, 0, -1 });
 	Uniform camera_mat = lit.get_uniform_location("a_camera");
-    
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glEnable(GL_DEPTH_TEST);
 
 	double old_time = WindowManager::get_time();
 	double delta_time = 0;

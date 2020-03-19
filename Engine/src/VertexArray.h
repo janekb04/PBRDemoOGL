@@ -66,6 +66,11 @@ public:
 		glVertexArrayAttribFormat(handle, attribute.index(), size, type, normalized, relative_offset);
 	}
 
+	void attrib_format_i(VertexAttribute attribute, int size, GLenum type, unsigned int relative_offset)
+	{
+		glVertexArrayAttribIFormat(handle, attribute.index(), size, type, relative_offset);
+	}
+
 	void binding_divisor(unsigned int binding_index, int divisor) const
 	{
 		glVertexArrayBindingDivisor(handle, binding_index, divisor);

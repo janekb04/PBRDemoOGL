@@ -17,3 +17,8 @@ std::string read_file(const char* filename)
 	}
 	throw std::runtime_error("failed to open file");
 }
+
+double rand01()
+{
+	return ((double)rand() / (RAND_MAX));
+}
