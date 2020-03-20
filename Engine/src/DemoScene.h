@@ -42,7 +42,7 @@ public:
 			std::vector<material> mats(mat_count);
 			for (int i = 0; i < mats.size(); ++i)
 			{
-				mats[i].base_idx = i % 7;
+				mats[i].base_idx = i % texture_paths.size();
 			}
 			material_ssbo.data(sizeof(material) * mats.size(), mats.data(), GL_STATIC_DRAW);
 			const unsigned MATERIAL_SSBO_IDX = 0;
@@ -53,8 +53,8 @@ public:
 			auto table = Mesh::from_file("res/Table.obj");
 			
 			MultiDrawElementsBuilder<Vertex, GLuint> builder;
-			builder.add_mesh(cube.vertices, cube.indices, 50);
-			builder.add_mesh(table.vertices, table.indices, 50);
+			builder.add_mesh(cube.vertices, cube.indices, 256000);
+			builder.add_mesh(table.vertices, table.indices, 256000);
 
 			VBO.data(sizeof(Vertex) * builder.vertices().size(), builder.vertices().data(), GL_STATIC_DRAW);
 			EBO.data(sizeof(GLuint) * builder.indices().size(), builder.indices().data(), GL_STATIC_DRAW);
@@ -62,10 +62,11 @@ public:
 			command_count = builder.commands().size();
 
 			std::vector<obj_data> transforms(builder.instances());
-			unsigned side_length = ceil(sqrt(transforms.size()));
+			unsigned side_length = ceil(cbrt(transforms.size()));
+			unsigned face_size = side_length * side_length;
 			for (int i = 0; i < transforms.size(); ++i)
 			{
-				transforms[i].model = glm::translate(glm::mat4(1), glm::vec3(i / side_length * 2, i % side_length * 2, 0));
+				transforms[i].model = glm::translate(glm::mat4(1), glm::vec3(i / face_size * 2, (i % face_size) / side_length * 2, (i % face_size) % side_length * 2));
 				transforms[i].material_idx = i % texture_paths.size();
 			}
 
@@ -114,7 +115,7 @@ public:
 		VAO.element_buffer(EBO);
 	}
 
-	void draw() const
+	void draw(bool multi) const
 	{
 		VAO.bind();
 		draw_indirect.bind(GL_DRAW_INDIRECT_BUFFER);
@@ -122,7 +123,15 @@ public:
 		glActiveTexture(GL_TEXTURE0);
 		textures.bind();
 		
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
+		if (multi)
+		{
+			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
+		}
+		else
+		{
+			for (int i = 0; i < command_count; ++i)
+				glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)(sizeof(glDrawElementsIndirectCommand) * i), 1, 0);
+		}
 	}
 
 	void new_frame(double delta_time)

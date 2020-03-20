@@ -54,7 +54,7 @@ int main()
 			
 			if (glm::length(move) != 0)
 				move = glm::normalize(move);
-			const float speed = 5;
+			const float speed = 50;
 			move *= speed * delta_time;
 			camera.transform.translate(move);
 
@@ -66,7 +66,7 @@ int main()
 			lit.use();
 			lit.uniform(camera_mat, false, camera.get_projection_matrix(wnd.viewport()) * camera.get_view_matrix());
 
-			scene.draw();
+			scene.draw(false);
 		}
 
         wnd.swap_buffers();
