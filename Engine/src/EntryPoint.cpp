@@ -14,6 +14,7 @@ int main()
     WindowManager::init();
 	OpenGLWindow wnd;
 
+	WindowManager::set_swap_interval(1);
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -32,9 +33,15 @@ int main()
 
 	double old_time = WindowManager::get_time();
 	double delta_time = 0;
+	unsigned long long frame = 0;
     while (!wnd.should_close())
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		if (frame % 60 == 0)
+		{
+			std::cout << 1/delta_time << '\n';
+		}
 
 		//update
 		{
@@ -66,14 +73,15 @@ int main()
 			lit.use();
 			lit.uniform(camera_mat, false, camera.get_projection_matrix(wnd.viewport()) * camera.get_view_matrix());
 
-			scene.draw(wnd.is_key_pressed(GLFW_KEY_M));
+			scene.draw(!wnd.is_key_pressed(GLFW_KEY_X));
 		}
 
         wnd.swap_buffers();
         WindowManager::poll_events();
-		
+
 		double new_time = WindowManager::get_time();
 		delta_time = new_time - old_time;
 		old_time = new_time;
+		++frame;
 	}
 }

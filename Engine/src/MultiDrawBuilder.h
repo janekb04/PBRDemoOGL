@@ -7,6 +7,15 @@ template <typename Vertex, typename Index>
 class MultiDrawElementsBuilder
 {
 private:
+	struct MeshData
+	{
+		Index first_index;
+		Index indices_count;
+		Index first_vertex;
+		Index vertices_count; // currently not needed, kept for future (for example mesh removal)
+	};
+private:
+	std::vector<MeshData> m_meshes;
 	std::vector<Vertex> m_vertices;
 	std::vector<Index> m_indices;
 	std::vector<glDrawElementsIndirectCommand> m_commands;
@@ -17,19 +26,36 @@ public:
 	{
 	}
 
-	void add_mesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices, unsigned instances)
+	unsigned add_mesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices)
 	{
-		glDrawElementsIndirectCommand cmd;
-		cmd.count = indices.size();
-		cmd.primCount = instances;
-		cmd.firstIndex = m_indices.size();
-		cmd.baseVertex = m_vertices.size();
-		cmd.baseInstance = m_instances;
+		MeshData mesh;
+		mesh.first_index = m_indices.size();
+		mesh.indices_count = indices.size();
+		mesh.first_vertex = m_vertices.size();
+		mesh.first_vertex = m_vertices.size();
 
-		m_commands.push_back(cmd);
 		m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
 		m_indices.insert(m_indices.end(), indices.begin(), indices.end());
+		m_meshes.push_back(mesh);
+
+		return m_meshes.size() - 1;
+	}
+
+	unsigned add_instance(unsigned mesh_idx, unsigned instances)
+	{
+		const MeshData& mesh = m_meshes[mesh_idx];
+		
+		glDrawElementsIndirectCommand cmd;
+		cmd.firstIndex = mesh.first_index;
+		cmd.count = mesh.indices_count;
+		cmd.baseVertex = mesh.first_vertex;
+		cmd.baseInstance = m_instances;
+		cmd.primCount = instances;
+
 		m_instances += instances;
+		m_commands.push_back(cmd);
+		
+		return m_commands.size() - 1;
 	}
 
 	const std::vector<Vertex>& vertices() const

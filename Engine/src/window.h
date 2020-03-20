@@ -150,6 +150,10 @@ public:
 	{
 		return glfwGetTime();
 	}
+	static void set_swap_interval(int interval)
+	{
+		glfwSwapInterval(interval);
+	}
 public:
 	static constexpr int DONT_CARE = GLFW_DONT_CARE;
 };

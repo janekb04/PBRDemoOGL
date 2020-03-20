@@ -53,10 +53,12 @@ public:
 			auto table = Mesh::from_file("res/Table.obj");
 			
 			MultiDrawElementsBuilder<Vertex, GLuint> builder;
-			for (int i = 0; i < 300000; ++i)
+			auto cube_id = builder.add_mesh(cube.vertices, cube.indices);
+			auto table_id = builder.add_mesh(table.vertices, table.indices);
+			for (int i = 0; i < 500000; ++i)
 			{
-				builder.add_mesh(cube.vertices, cube.indices, 1);
-				builder.add_mesh(table.vertices, table.indices, 1);
+				builder.add_instance(cube_id, 1);
+				builder.add_instance(table_id, 1);
 			}
 
 			VBO.data(sizeof(Vertex) * builder.vertices().size(), builder.vertices().data(), GL_STATIC_DRAW);
