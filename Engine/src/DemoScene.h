@@ -31,18 +31,25 @@ class DemoScene
 	inline static const std::vector<const char*> texture_paths = 
 	{
 		"res/container.png",
-		"res/wood.png"
+		"res/wood.png",
+		"res/grass.jpg",
+		"res/uv.png",
+		"res/plastic.jpg",
+		"res/cobble.jpg",
+		"res/stone.png",
+		"res/brick.jpg",
+		"res/concrete.jpg"
 	};
 public:
 	DemoScene() :
 		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size()))
 	{
-		const int mat_count = 7;
+		const int mat_count = texture_paths.size();
 		{
 			std::vector<material> mats(mat_count);
 			for (int i = 0; i < mats.size(); ++i)
 			{
-				mats[i].base_idx = i % texture_paths.size();
+				mats[i].base_idx = i;
 			}
 			material_ssbo.data(sizeof(material) * mats.size(), mats.data(), GL_STATIC_DRAW);
 			const unsigned MATERIAL_SSBO_IDX = 0;
@@ -72,7 +79,7 @@ public:
 			for (int i = 0; i < transforms.size(); ++i)
 			{
 				transforms[i].model = glm::translate(glm::mat4(1), glm::vec3(i / face_size * 2, (i % face_size) / side_length * 2, (i % face_size) % side_length * 2));
-				transforms[i].material_idx = i % texture_paths.size();
+				transforms[i].material_idx = rand() % texture_paths.size();
 			}
 
 			instanced_vbo.data(transforms.size() * sizeof(obj_data), transforms.data(), GL_STATIC_DRAW);
