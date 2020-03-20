@@ -66,7 +66,7 @@ int main()
 			lit.use();
 			lit.uniform(camera_mat, false, camera.get_projection_matrix(wnd.viewport()) * camera.get_view_matrix());
 
-			scene.draw(false);
+			scene.draw(wnd.is_key_pressed(GLFW_KEY_M));
 		}
 
         wnd.swap_buffers();
