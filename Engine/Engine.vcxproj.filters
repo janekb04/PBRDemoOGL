@@ -96,6 +96,9 @@
     <ClInclude Include="src\Texture2dArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\OrbitCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\imgui\imgui.cpp">

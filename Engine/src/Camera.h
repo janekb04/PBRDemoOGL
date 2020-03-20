@@ -20,6 +20,6 @@ struct PerspectiveCamera
 	}
 	glm::mat4 get_view_matrix() const
 	{
-		return transform.to_mat4();
+		return glm::inverse(transform.to_mat4());
 	}
 };

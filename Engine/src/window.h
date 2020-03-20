@@ -321,6 +321,7 @@ private: //private static methods
 		glfwSetWindowContentScaleCallback(handle, content_scale_handler);
 		//Input
 		glfwSetDropCallback(handle, drop_handler);
+		glfwSetScrollCallback(handle, scroll_handler);
 
 		return handle;
 	}
@@ -395,6 +396,11 @@ private: //private static methods
 		auto instance = get_instance(HWND);
 		instance->drop_callback(amount, paths);
 	}
+	static void scroll_handler(GLFWwindow* HWND, double xoffset, double yoffset)
+	{
+		auto instance = get_instance(HWND);
+		instance->scroll_callback(xoffset, yoffset);
+	}
 protected: // callbacks
 	//Window callbacks
 	virtual void framebuffer_size_callback(int width, int height) {}
@@ -408,7 +414,7 @@ protected: // callbacks
 	virtual void content_scale_callback(float x, float y) {}
 	//Input callbacks
 	virtual void drop_callback(int count, const char** paths) {}
-
+	virtual void scroll_callback(double xoffset, double yoffset) {}
 public:	//public essential methods
 	Window(const Options& options = {}, const CreationHints& hints = {}) :
 		handle(create_window(*this, options, hints)),
@@ -453,11 +459,20 @@ public: // window options
 		glfwGetFramebufferSize(handle, &width, &height);
 		return { width, height };
 	}
-
+	std::pair<double, double> get_cursor_position() const noexcept
+	{
+		double x, y;
+		glfwGetCursorPos(handle, &x, &y);
+		return { x, y };
+	}
 public: //Input
-	bool is_key_pressed(int key_code)
+	bool is_key_pressed(int key_code) const
 	{
 		return glfwGetKey(handle, key_code) == GLFW_PRESS;
+	}
+	bool is_mouse_button_pressed(int button_code) const
+	{
+		return glfwGetMouseButton(handle, button_code) == GLFW_PRESS;
 	}
 public:
 	GLFWwindow* get_handle() const

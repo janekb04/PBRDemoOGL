@@ -22,3 +22,7 @@ double rand01()
 {
 	return ((double)rand() / (RAND_MAX));
 }
+
+template <typename T> int sgn(const T& val) {
+	return (T(0) < val) - (val < T(0));
+}

@@ -124,10 +124,17 @@ class OpenGLWindow : public Window
 #endif // !NDEBUG
 		return hints;
 	}
+private:
+	double scroll;
+	double cursor_x, cursor_y;
 protected:
 	virtual void framebuffer_size_callback(int width, int height) override 
 	{
 		glViewport(0, 0, width, height);
+	}
+	virtual void scroll_callback(double xoffset, double yoffset) override
+	{
+		scroll = yoffset;
 	}
 public:
 	OpenGLWindow() : 
@@ -150,5 +157,25 @@ public:
 	{
 		auto [width, height] = get_framebuffer_size();
 		return Viewport{ {0,0}, {width, height} };
+	}
+
+	void end_frame()
+	{
+		scroll = 0;
+		auto [cx, cy] = get_cursor_position();
+		cursor_x = cx;
+		cursor_y = cy;
+		swap_buffers();
+	}
+
+	double get_scroll() const
+	{
+		return scroll;
+	}
+
+	std::pair<double, double> cursor_delta() const
+	{
+		auto [new_x, new_y] = get_cursor_position();
+		return { new_x - cursor_x, new_y - cursor_y };
 	}
 };

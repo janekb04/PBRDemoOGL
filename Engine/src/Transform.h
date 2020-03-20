@@ -54,6 +54,10 @@ public:
 	{
 		return trans;
 	}
+	glm::mat3 to_mat3() const
+	{
+		return glm::mat3{ trans };
+	}
 	glm::vec3 get_position() const
 	{
 		return trans[3];
@@ -91,9 +95,25 @@ public:
 	{
 		set_position(get_position() + translation);
 	}
+	void translate_local(const glm::vec3& translation)
+	{
+		translate(to_mat3() * translation);
+	}
 	void rotate(const glm::quat& rotation)
 	{
 		set_orientation(get_orientation() * rotation);
+	}
+	glm::vec3 forward() const
+	{
+		return glm::normalize(to_mat4() * glm::vec4{ 0, 0, 1, 0 });
+	}
+	glm::vec3 right() const
+	{
+		return glm::normalize(to_mat4() * glm::vec4{ 1, 0, 0, 0 });
+	}
+	glm::vec3 up() const
+	{
+		return glm::normalize(to_mat4() * glm::vec4{ 0, 1, 0, 0 });
 	}
 public:
 	static const Transform ORIGIN;
