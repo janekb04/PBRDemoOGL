@@ -5,6 +5,8 @@
 #include "VertexArray.h"
 #include "MultiDrawBuilder.h"
 #include "Vertex.h"
+#include "Texture2dArray.h"
+#include "Mesh.h"
 
 class DemoScene
 {
@@ -13,6 +15,7 @@ class DemoScene
 	Buffer draw_indirect;
 	Buffer instanced_vbo;
 	Buffer material_ssbo;
+	Texture2dArray textures;
 	int command_count{ 0 };
 
 	struct obj_data
@@ -22,107 +25,36 @@ class DemoScene
 	};
 	struct material
 	{
-		//int base_idx;
-		glm::vec4 color;
+		int base_idx;
+	};
+
+	inline static const std::vector<const char*> texture_paths = 
+	{
+		"res/container.png",
+		"res/wood.png"
 	};
 public:
-	DemoScene()
+	DemoScene() :
+		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size()))
 	{
 		const int mat_count = 7;
 		{
 			std::vector<material> mats(mat_count);
 			for (int i = 0; i < mats.size(); ++i)
 			{
-				//mats[i].base_idx = 1;
-				mats[i].color = glm::vec4(rand01(), rand01(), rand01(), 1);
+				mats[i].base_idx = i % 7;
 			}
 			material_ssbo.data(sizeof(material) * mats.size(), mats.data(), GL_STATIC_DRAW);
 			const unsigned MATERIAL_SSBO_IDX = 0;
 			material_ssbo.bind_base(GL_SHADER_STORAGE_BUFFER, MATERIAL_SSBO_IDX);
 		}
 		{
+			auto cube = Mesh::from_file("res/container.obj");
+			auto table = Mesh::from_file("res/Table.obj");
+			
 			MultiDrawElementsBuilder<Vertex, GLuint> builder;
-			builder.add_mesh(
-				{
-					{
-						{{-0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f}, {0,0,0}},
-						{{-0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{-0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f}, {0,0,0}},
-						{{-0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f}, {0,0,0}},
-						{{-0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{-0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f}, {0,0,0}},
-						{{-0.5f,  0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{-0.5f,  0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f}, {0,0,0}},
-						{{-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f}, {0,0,0}},
-						{{-0.5f,  0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f, -0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f, -0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f, -0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{-0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, { 1.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{-0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, { 0.0f, 0.0f}, {0,0,0}},
-						{{-0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{-0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, { 1.0f, 1.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{ 0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f}, {0,0,0}},
-						{{-0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, { 0.0f, 0.0f}, {0,0,0}},
-						{{-0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f}, {0,0,0}}
-					}
-				},
-				{
-					2,
-					1,
-					0,
-					5,
-					4,
-					3,
-					6,
-					7,
-					8,
-					9,
-					10,
-					11,
-					12,
-					13,
-					14,
-					15,
-					16,
-					17,
-					20,
-					19,
-					18,
-					23,
-					22,
-					21,
-					24,
-					25,
-					26,
-					27,
-					28,
-					29,
-					32,
-					31,
-					30,
-					35,
-					34,
-					33
-				},
-				100
-			);
+			builder.add_mesh(cube.vertices, cube.indices, 50);
+			builder.add_mesh(table.vertices, table.indices, 50);
 
 			VBO.data(sizeof(Vertex) * builder.vertices().size(), builder.vertices().data(), GL_STATIC_DRAW);
 			EBO.data(sizeof(GLuint) * builder.indices().size(), builder.indices().data(), GL_STATIC_DRAW);
@@ -134,7 +66,7 @@ public:
 			for (int i = 0; i < transforms.size(); ++i)
 			{
 				transforms[i].model = glm::translate(glm::mat4(1), glm::vec3(i / side_length * 2, i % side_length * 2, 0));
-				transforms[i].material_idx = i % mat_count;
+				transforms[i].material_idx = i % texture_paths.size();
 			}
 
 			instanced_vbo.data(transforms.size() * sizeof(obj_data), transforms.data(), GL_STATIC_DRAW);
@@ -186,6 +118,10 @@ public:
 	{
 		VAO.bind();
 		draw_indirect.bind(GL_DRAW_INDIRECT_BUFFER);
+		
+		glActiveTexture(GL_TEXTURE0);
+		textures.bind();
+		
 		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
 	}
 

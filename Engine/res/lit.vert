@@ -12,16 +12,14 @@ layout (location = 4) in mat4 a_model;
 //      location = 7
 layout (location = 8) in int a_material_idx;
 
-//out vec2 v_uv;
-//out flat int v_base_idx;
-out vec4 color;
+out vec2 v_uv;
+out flat int v_base_idx;
 
 uniform mat4 a_camera;
 
 struct material
 {
-	//int base_idx;
-	vec4 color;
+	int base_idx;
 };
 
 layout (std430, binding = 0) buffer materials
@@ -35,7 +33,6 @@ void main()
 
 	material mat = a_materials[a_material_idx];
 	
-	//v_base_idx = mat.base_idx;
-	//v_uv = a_uv;
-	color = mat.color;
+	v_base_idx = mat.base_idx;
+	v_uv = a_uv;
 }

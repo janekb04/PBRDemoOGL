@@ -10,8 +10,7 @@ private:
 	static GLuint create_texture()
 	{
 		GLuint handle;
-		glGenTextures(1, &handle);
-		glBindTexture(GL_TEXTURE_2D, handle);
+		glCreateTextures(GL_TEXTURE_2D, 1, &handle);
 		return handle;
 	}
 	Texture2d(GLuint handle) :
