@@ -25,7 +25,9 @@
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\OpenGLWindow.h" />
     <ClInclude Include="src\OrbitCamera.h" />
+    <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\UnorderedArraySet.h" />
     <ClInclude Include="src\Texture2d.h" />
     <ClInclude Include="src\MultiDrawBuilder.h" />
     <ClInclude Include="src\Index.h" />

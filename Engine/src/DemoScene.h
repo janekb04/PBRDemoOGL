@@ -127,27 +127,17 @@ public:
 		VAO.element_buffer(EBO);
 	}
 
-	void draw(bool multi) const
+	void draw() const
+	{
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
+	}
+
+	void setup_state()
 	{
 		VAO.bind();
 		draw_indirect.bind(GL_DRAW_INDIRECT_BUFFER);
-		
+
 		glActiveTexture(GL_TEXTURE0);
 		textures.bind();
-		
-		if (multi)
-		{
-			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
-		}
-		else
-		{
-			for (int i = 0; i < command_count; ++i)
-				glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)(sizeof(glDrawElementsIndirectCommand) * i), 1, 0);
-		}
-	}
-
-	void new_frame(double delta_time)
-	{
-
 	}
 };

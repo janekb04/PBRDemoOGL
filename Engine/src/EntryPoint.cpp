@@ -76,7 +76,8 @@ int main()
 			lit.use();
 			lit.uniform(camera_mat, false, camera.get_projection_matrix(wnd.viewport()) * camera.get_view_matrix());
 
-			scene.draw(!wnd.is_key_pressed(GLFW_KEY_X));
+			scene.setup_state();
+			scene.draw();
 		}
 
 		wnd.end_frame();
