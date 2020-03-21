@@ -18,9 +18,33 @@ public:
 	{
 	}
 
+	Buffer(const Buffer&) = delete;
+
+	Buffer(Buffer&& other) :
+		handle(other.handle)
+	{
+		other.handle = 0;
+	}
+
 	void data(size_t size, const void* data, GLenum usage) const
 	{
 		glNamedBufferData(handle, size, data, usage);
+	}
+
+	void storage(size_t size, const void* data, GLbitfield flags) const
+	{
+		glNamedBufferStorage(handle, size, data, flags);
+	}
+
+	void* map_range(size_t offset, size_t length, GLbitfield access) const
+	{
+		glMapNamedBufferRange(handle, offset, length, access);
+	}
+
+	void unmap()
+	{
+		if (!glUnmapNamedBuffer(handle))
+			throw std::runtime_error("data store contents have become corrupt during the time the data store was mapped");
 	}
 
 	GLuint get_handle() const

@@ -18,6 +18,7 @@ private:
 	{
 	}
 public:
+	Texture2d(const Texture2d&) = delete;
 	static Texture2d from_file(const std::string& path)
 	{
 		int width, height, channels;

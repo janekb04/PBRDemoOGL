@@ -7,6 +7,7 @@
 #include "Vertex.h"
 #include "Texture2dArray.h"
 #include "Mesh.h"
+#include "GPUVector.h"
 
 class DemoScene
 {
@@ -68,8 +69,8 @@ public:
 				builder.add_instance(table_id, 1);
 			}
 
-			VBO.data(sizeof(Vertex) * builder.vertices().size(), builder.vertices().data(), GL_STATIC_DRAW);
-			EBO.data(sizeof(GLuint) * builder.indices().size(), builder.indices().data(), GL_STATIC_DRAW);
+			VBO.storage(sizeof(Vertex) * builder.vertices().size(), builder.vertices().data(), 0);
+			EBO.storage(sizeof(GLuint) * builder.indices().size(), builder.indices().data(), 0);
 			draw_indirect.data(sizeof(glDrawElementsIndirectCommand) * builder.commands().size(), builder.commands().data(), GL_STATIC_DRAW);
 			command_count = builder.commands().size();
 

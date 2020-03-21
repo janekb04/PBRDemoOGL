@@ -18,6 +18,7 @@ private:
 	{
 	}
 public:
+	Texture2dArray(const Texture2dArray&) = delete;
 	static Texture2dArray from_files(const char* const*  paths, int count)
 	{
 		std::vector<GLubyte> data;
