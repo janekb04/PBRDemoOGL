@@ -7,6 +7,7 @@
 #include "Vertex.h"
 #include "Texture2dArray.h"
 #include "Mesh.h"
+#include "Material.h"
 
 class Scene
 {
@@ -21,15 +22,12 @@ private:
 	int command_count;
 
 public:
-	struct obj_data
+	struct Model
 	{
-		glm::mat4 model;
+		glm::mat4 model_transform;
 		int material_idx;
 	};
-	struct material
-	{
-		int base_idx;
-	};
+
 public:
 	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes) :
 		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size())),
@@ -67,7 +65,7 @@ public:
 		VAO.attrib_format(TANGENT_IDX, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, tangent));
 
 		const unsigned int INSTANCED_VBO_IDX = 1;
-		VAO.vertex_buffer(INSTANCED_VBO_IDX, instanced_vbo, 0, sizeof(obj_data));
+		VAO.vertex_buffer(INSTANCED_VBO_IDX, instanced_vbo, 0, sizeof(Model));
 		VAO.binding_divisor(INSTANCED_VBO_IDX, 1);
 		const VertexAttribute MODEL_IDX{ 4 };
 		for (int i = 0; i < 4; ++i)
@@ -75,16 +73,26 @@ public:
 			VertexAttribute column{ MODEL_IDX.index() + i };
 			VAO.enable_attrib(column);
 			VAO.attrib_binding(column, INSTANCED_VBO_IDX);
-			VAO.attrib_format(column, 4, GL_FLOAT, GL_FALSE, offsetof(obj_data, model) + sizeof(glm::mat4::col_type) * i);
+			VAO.attrib_format(column, 4, GL_FLOAT, GL_FALSE, offsetof(Model, model_transform) + sizeof(glm::mat4::col_type) * i);
 		}
 		const VertexAttribute MATERIAL_IDX_IDX{ 8 };
 		VAO.enable_attrib(MATERIAL_IDX_IDX);
 		VAO.attrib_binding(MATERIAL_IDX_IDX, INSTANCED_VBO_IDX);
-		VAO.attrib_format_i(MATERIAL_IDX_IDX, 1, GL_INT, offsetof(obj_data, material_idx));
+		VAO.attrib_format_i(MATERIAL_IDX_IDX, 1, GL_INT, offsetof(Model, material_idx));
 
 		VAO.element_buffer(EBO);
 	}
 
+public:
+	unsigned add_material(const Material& material);
+	Material& get_material(unsigned material_id);
+	void remove_material(unsigned material_id);
+
+	unsigned add_model(unsigned mesh_id, unsigned material_id);
+	Model& get_model(unsigned model_id);
+	void set_model_mesh(unsigned model_id, unsigned mesh_id);
+	void remove_model(unsigned model_id);
+public:
 	void draw() const
 	{
 		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
