@@ -1,4 +1,10 @@
 #pragma once
 
 #include "GPUAllocator.h"
-#include <vector>
+
+template <typename T, typename Allocator = std::allocator<T>>
+class GPUVector
+{
+private:
+	
+};
