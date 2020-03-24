@@ -27,6 +27,7 @@ private:
 	VertexArray VAO;
 	MultiDrawElementsBuilder<Vertex, GLuint, GPUVector, GPUVector, gpu_unordered_array_set> builder;
 	Texture2dArray textures;
+	size_t texture_num;
 
 	gpu_unordered_array_set<Model> instance_data;
 	GPUVector<Material> materials;
@@ -37,7 +38,8 @@ public:
 	using TextureHandle = unsigned;
 public:
 	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes) :
-		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size()))
+		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size())),
+		texture_num(texture_paths.size())
 	{
 		for (const Mesh& mesh : meshes)
 			builder.add_mesh(mesh.vertices, mesh.indices);
@@ -119,6 +121,11 @@ public:
 	{
 		instance_data.erase(model_id.first);
 		const_cast<gpu_unordered_array_set<glDrawElementsIndirectCommand>&>(builder.commands()).erase(model_id.second);
+	}
+public:
+	size_t texture_count() const
+	{
+		return texture_num;
 	}
 public:
 	void draw() const
