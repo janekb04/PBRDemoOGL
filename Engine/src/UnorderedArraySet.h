@@ -9,8 +9,9 @@
 template <typename T, typename Container = std::vector<T>>
 class unordered_array_set
 {
+protected:
+	Container c;
 private:
-	Container m_container;
 	using iter_list_t = std::list<int>;
 	iter_list_t m_iterators;
 	std::vector<iter_list_t::iterator> m_element_iterators;
@@ -20,7 +21,7 @@ private:
 	{
 	private:
 		It m_it;
-		Container* m_container;
+		Container* c;
 
 		It underlying_iterator()
 		{
@@ -28,15 +29,21 @@ private:
 		}
 		friend class unordered_array_set<T, Container>;
 	public:
+		using difference_type = size_t;
+		using value_type = It::value_type;
+		using pointer = It::pointer;
+		using reference = It::reference;
+		using iterator_category = std::bidirectional_iterator_tag;
+	public:
 		_generic_iterator() :
 			m_it{},
-			m_container{nullptr}
+			c{nullptr}
 		{
 		}
 
 		_generic_iterator(It it, Container* p_container) :
 			m_it{ it },
-			m_container{ p_container }
+			c{ p_container }
 		{
 		}
 
@@ -66,7 +73,7 @@ private:
 
 		typename Container::reference& operator*() const noexcept
 		{
-			return (*m_container)[*m_it];
+			return (*c)[*m_it];
 		}
 
 		typename Container::pointer operator->() const noexcept
@@ -84,6 +91,7 @@ private:
 		}
 	};
 public:
+	using container_type = Container;
 	using size_type = std::size_t;
 	using value_type = T;
 	using iterator = _generic_iterator<typename iter_list_t::iterator, Container>;
@@ -93,10 +101,10 @@ public:
 private:
 	iterator _after_insert()
 	{
-		m_iterators.push_back(m_container.size() - 1);
+		m_iterators.push_back(c.size() - 1);
 		auto it = std::prev(m_iterators.end());
 		m_element_iterators.push_back(it);
-		return { it, &m_container };
+		return { it, &c };
 	}
 public:
 	unordered_array_set() = default;
@@ -116,70 +124,88 @@ public:
 
 	iterator begin() noexcept
 	{
-		return { m_iterators.begin(), &m_container };
+		return { m_iterators.begin(), &c };
 	}
 	const_iterator begin() const noexcept
 	{
-		return { m_iterators.begin(), &m_container };
+		return { m_iterators.begin(), &c };
 	}
 	const_iterator cbegin() const noexcept
 	{
-		return { m_iterators.cbegin(), &m_container };
+		return { m_iterators.cbegin(), &c };
 	}
 
 	iterator end() noexcept
 	{
-		return { m_iterators.end(), &m_container };
+		return { m_iterators.end(), &c };
 	}
 	const_iterator end() const noexcept
 	{
-		return { m_iterators.end(), &m_container };
+		return { m_iterators.end(), &c };
 	}
 	const_iterator cend() const noexcept
 	{
-		return { m_iterators.cend(), &m_container };
+		return { m_iterators.cend(), &c };
 	}
 
 	reverse_iterator rbegin() noexcept
 	{
-		return { m_iterators.rbegin(), &m_container };
+		return { m_iterators.rbegin(), &c };
 	}
 	const_reverse_iterator rbegin() const noexcept
 	{
-		return { m_iterators.rbegin(), &m_container };
+		return { m_iterators.rbegin(), &c };
 	}
 	const_reverse_iterator crbegin() const noexcept
 	{
-		return { m_iterators.crbegin(), &m_container };
+		return { m_iterators.crbegin(), &c };
 	}
 
 	reverse_iterator rend() noexcept
 	{
-		return { m_iterators.rend(), &m_container };
+		return { m_iterators.rend(), &c };
 	}
 	const_reverse_iterator rend() const noexcept
 	{
-		return { m_iterators.rend(), &m_container };
+		return { m_iterators.rend(), &c };
 	}
 	const_reverse_iterator crend() const noexcept
 	{
-		return { m_iterators.crend(), &m_container };
+		return { m_iterators.crend(), &c };
+	}
+
+	reference front()
+	{
+		return *begin();
+	}
+	const_reference front() const
+	{
+		return *cbegin();
+	}
+
+	reference back()
+	{
+		return *std::prev(end());
+	}
+	const_reference back() const
+	{
+		return *std::prev(cend());
 	}
 
 	bool empty() const noexcept
 	{
-		return m_container.empty();
+		return c.empty();
 	}
 
 	size_type size() const noexcept
 	{
-		return m_container.size();
+		return c.size();
 	}
 	size_type max_size() const noexcept
 	{
 		return std::min(
 			std::min(
-				m_container.max_size(),
+				c.max_size(),
 				m_iterators.max_size()
 			),
 			m_element_iterators.max_size()
@@ -188,26 +214,26 @@ public:
 
 	void clear() noexcept
 	{
-		m_container.clear();
+		c.clear();
 		m_iterators.clear();
 		m_element_iterators.clear();
 	}
 
 	iterator insert(const value_type& value)
 	{
-		m_container.push_back(value);
+		c.push_back(value);
 		return _after_insert();
 	}
 	iterator insert(value_type&& value)
 	{
-		m_container.push_back(std::move(value));
+		c.push_back(std::move(value));
 		return _after_insert();
 	}
 
 	template<typename... Args>
 	iterator emplace(Args&&... args)
 	{
-		m_container.emplace_back(std::forward<Args>(args)...);
+		c.emplace_back(std::forward<Args>(args)...);
 		return _after_insert();
 	}
 
@@ -215,17 +241,17 @@ public:
 	{
 		int i = *pos.underlying_iterator();
 
-		m_container[i] = std::move(m_container[size() - 1]);
+		c[i] = std::move(c[size() - 1]);
 		*m_element_iterators[size() - 1] = *m_element_iterators[i];
 		m_element_iterators[i] = std::move(m_element_iterators[size() - 1]);
 
-		m_container.pop_back();
+		c.pop_back();
 		m_element_iterators.pop_back();
 
 		auto next = std::next(pos.underlying_iterator());
 		m_iterators.erase(pos.underlying_iterator());
 
-		return { next, &m_container };
+		return { next, &c };
 	}
 
 	iterator erase(iterator first, iterator last)
@@ -236,19 +262,40 @@ public:
 		return result;
 	}
 
+	void push_back(const T& value)
+	{
+		insert(value);
+	}
+
+	void push_back(T&& value)
+	{
+		insert(std::move(value));
+	}
+
+	template<typename... Args>
+	reference emplace_back(Args&&... args)
+	{
+		return *emplace(std::forward<Args>(args)...);
+	}
+
+	void pop_back()
+	{
+		erase(std::prev(end()));
+	}
+
 	void swap(unordered_array_set<T, Container>& other)
 	{
-		m_container.swap(other.m_container);
+		c.swap(other.c);
 		m_iterators.swap(other.m_iterators);
 		m_element_iterators.swap(other.m_element_iterators);
 	}
 
 	value_type* data() noexcept
 	{
-		return m_container.data();
+		return c.data();
 	}
 	const value_type* data() const noexcept
 	{
-		return m_container.data();
+		return c.data();
 	}
 };

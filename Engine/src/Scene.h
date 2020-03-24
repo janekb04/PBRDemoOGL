@@ -8,38 +8,43 @@
 #include "Texture2dArray.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "UnorderedArraySet.h"
+#include "GPUVector.h"
+#include "Utility.h"
 
 class Scene
 {
-private:
-	VertexArray VAO;
-	Buffer VBO, EBO;
-	Texture2dArray textures;
-	int texture_count;
-	Buffer draw_indirect;
-	Buffer instanced_vbo;
-	Buffer material_ssbo;
-	int command_count;
-
 public:
 	struct Model
 	{
 		glm::mat4 model_transform;
 		int material_idx;
 	};
+private:
+	template <typename T>
+	using gpu_unordered_array_set = unordered_array_set<T, GPUVector<T>>;
+private:
+	VertexArray VAO;
+	MultiDrawElementsBuilder<Vertex, GLuint, GPUVector, GPUVector, gpu_unordered_array_set> builder;
+	Texture2dArray textures;
 
+	gpu_unordered_array_set<Model> instance_data;
+	GPUVector<Material> materials;
+public:
+	using MaterialHandle = typename GPUVector<Material>::iterator;
+	using ModelHandle = std::pair<typename unordered_array_set<Model>::iterator, gpu_unordered_array_set<glDrawElementsIndirectCommand>::iterator>;
+	using MeshHandle = typename decltype(builder)::MeshID;
+	using TextureHandle = unsigned;
 public:
 	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes) :
-		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size())),
-		texture_count(texture_paths.size()),
-		command_count(0)
+		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size()))
 	{
-		MultiDrawElementsBuilder<Vertex, GLuint> builder;
 		for (const Mesh& mesh : meshes)
 			builder.add_mesh(mesh.vertices, mesh.indices);
 
-		VBO.storage(sizeof(Vertex) * builder.vertices().size(), builder.vertices().data(), 0);
-		EBO.storage(sizeof(GLuint) * builder.indices().size(), builder.indices().data(), 0);
+		Buffer& VBO = builder.vertices().get_buffer();
+		Buffer& EBO = builder.indices().get_buffer();
+		Buffer& instanced_vbo = get_container(instance_data).get_buffer();
 
 		const unsigned int VBO_IDX = 0;
 		VAO.vertex_buffer(VBO_IDX, VBO, 0, sizeof(Vertex));
@@ -84,24 +89,47 @@ public:
 	}
 
 public:
-	unsigned add_material(const Material& material);
-	Material& get_material(unsigned material_id);
-	void remove_material(unsigned material_id);
+	MaterialHandle add_material(const Material& material)
+	{
+		return materials.push_back(material);
+	}
+	Material& get_material(MaterialHandle material)
+	{
+		return *material;
+	}
 
-	unsigned add_model(unsigned mesh_id, unsigned material_id);
-	Model& get_model(unsigned model_id);
-	void set_model_mesh(unsigned model_id, unsigned mesh_id);
-	void remove_model(unsigned model_id);
+	ModelHandle add_model(MeshHandle mesh_id, MaterialHandle material)
+	{
+		unsigned material_idx = &*material - materials.data();
+		auto data_it = instance_data.insert({ glm::mat4(1.0f),  material_idx});
+		builder.add_batch(mesh_id, 1);
+		auto command_it = std::prev(builder.commands().end());
+
+		return { data_it, command_it };
+	}
+	Model& get_model(ModelHandle model_id)
+	{
+		return *model_id.first;
+	}
+	void set_model_mesh(ModelHandle model_id, MeshHandle mesh)
+	{
+		builder.change_batch_mesh(model_id.second, mesh);
+	}
+	void remove_model(ModelHandle model_id)
+	{
+		instance_data.erase(model_id.first);
+		const_cast<gpu_unordered_array_set<glDrawElementsIndirectCommand>&>(builder.commands()).erase(model_id.second);
+	}
 public:
 	void draw() const
 	{
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, command_count, 0);
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, builder.commands().size(), 0);
 	}
 
 	void setup_state()
 	{
 		VAO.bind();
-		draw_indirect.bind(GL_DRAW_INDIRECT_BUFFER);
+		get_container(builder.commands()).get_buffer().bind(GL_DRAW_INDIRECT_BUFFER);
 
 		glActiveTexture(GL_TEXTURE0);
 		textures.bind();

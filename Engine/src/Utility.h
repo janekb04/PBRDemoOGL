@@ -26,3 +26,14 @@ double rand01()
 template <typename T> int sgn(const T& val) {
 	return (T(0) < val) - (val < T(0));
 }
+
+template <class Adapter>
+typename Adapter::container_type& get_container(Adapter& a)
+{
+	struct hack : Adapter {
+		static typename Adapter::container_type& get(Adapter& a) {
+			return a.*&hack::c;
+		}
+	};
+	return hack::get(a);
+}

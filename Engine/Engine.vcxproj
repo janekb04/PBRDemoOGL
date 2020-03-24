@@ -15,7 +15,6 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Defines.h" />
     <ClInclude Include="src\DemoScene.h" />
-    <ClInclude Include="src\GPUAllocator.h" />
     <ClInclude Include="src\GPUVector.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />

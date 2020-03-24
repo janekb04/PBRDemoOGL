@@ -65,8 +65,8 @@ public:
 			auto table_id = builder.add_mesh(table.vertices, table.indices);
 			for (int i = 0; i < 500000; ++i)
 			{
-				builder.add_instance(cube_id, 1);
-				builder.add_instance(table_id, 1);
+				builder.add_batch(cube_id, 1);
+				builder.add_batch(table_id, 1);
 			}
 
 			VBO.storage(sizeof(Vertex) * builder.vertices().size(), builder.vertices().data(), 0);
@@ -74,7 +74,7 @@ public:
 			draw_indirect.data(sizeof(glDrawElementsIndirectCommand) * builder.commands().size(), builder.commands().data(), GL_STATIC_DRAW);
 			command_count = builder.commands().size();
 
-			std::vector<obj_data> transforms(builder.instances());
+			std::vector<obj_data> transforms(builder.total_instances());
 			unsigned side_length = ceil(cbrt(transforms.size()));
 			unsigned face_size = side_length * side_length;
 			for (int i = 0; i < transforms.size(); ++i)

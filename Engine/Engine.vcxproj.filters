@@ -108,9 +108,6 @@
     <ClInclude Include="src\GPUVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GPUAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\MemoryBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
