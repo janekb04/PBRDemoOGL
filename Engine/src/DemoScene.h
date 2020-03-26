@@ -7,7 +7,7 @@
 #include "Vertex.h"
 #include "Texture2dArray.h"
 #include "Mesh.h"
-#include "GPUVector.h"
+#include "GPUArray.h"
 
 class DemoScene
 {

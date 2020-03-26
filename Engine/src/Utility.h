@@ -37,3 +37,10 @@ typename Adapter::container_type& get_container(Adapter& a)
 	};
 	return hack::get(a);
 }
+
+template<class T, class... Args>
+constexpr T* construct_at(T* p, Args&&... args) // replacement for C++20 std::construct_at
+{
+	return ::new (const_cast<void*>(static_cast<const volatile void*>(p)))
+		T(std::forward<Args>(args)...);
+}

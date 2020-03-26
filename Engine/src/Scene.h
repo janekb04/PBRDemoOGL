@@ -9,11 +9,14 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "UnorderedArraySet.h"
-#include "GPUVector.h"
+#include "GPUArray.h"
 #include "Utility.h"
 
 class Scene
 {
+private:
+	template <typename T>
+	using gpu_unordered_array_set = unordered_array_set<T, GPUArray<T>>;
 public:
 	struct Model
 	{
@@ -21,31 +24,104 @@ public:
 		int material_idx;
 	};
 private:
-	template <typename T>
-	using gpu_unordered_array_set = unordered_array_set<T, GPUVector<T>>;
+	struct MeshData
+	{
+		Index first_index;
+		Index indices_count;
+		Index first_vertex;
+		Index vertices_count; // currently not needed, kept for future (for example mesh removal)
+	};
 private:
+	std::vector<MeshData> m_meshes;
+	GPUArray<Vertex> m_vertices;
+	GPUArray<Index> m_indices;
+	gpu_unordered_array_set<glDrawElementsIndirectCommand> m_commands;
+	unsigned m_instances;
+
 	VertexArray VAO;
-	MultiDrawElementsBuilder<Vertex, GLuint, GPUVector, GPUVector, gpu_unordered_array_set> builder;
 	Texture2dArray textures;
 	size_t texture_num;
 
 	gpu_unordered_array_set<Model> instance_data;
-	GPUVector<Material> materials;
+	GPUArray<Material> materials;
 public:
-	using MaterialHandle = typename GPUVector<Material>::iterator;
+	using MaterialHandle = typename GPUArray<Material>::iterator;
 	using ModelHandle = std::pair<typename unordered_array_set<Model>::iterator, gpu_unordered_array_set<glDrawElementsIndirectCommand>::iterator>;
-	using MeshHandle = typename decltype(builder)::MeshID;
+	using MeshHandle = unsigned;
 	using TextureHandle = unsigned;
-public:
-	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes) :
-		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size())),
-		texture_num(texture_paths.size())
+	using BatchHandle = typename decltype(m_commands)::iterator;
+private:
+	MeshHandle add_mesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices)
 	{
-		for (const Mesh& mesh : meshes)
-			builder.add_mesh(mesh.vertices, mesh.indices);
+		MeshData mesh;
+		mesh.first_index = m_indices.size();
+		mesh.indices_count = indices.size();
+		mesh.first_vertex = m_vertices.size();
+		mesh.first_vertex = m_vertices.size();
 
-		Buffer& VBO = builder.vertices().get_buffer();
-		Buffer& EBO = builder.indices().get_buffer();
+		m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
+		m_indices.insert(m_indices.end(), indices.begin(), indices.end());
+		m_meshes.push_back(mesh);
+
+		return m_meshes.size() - 1;
+	}
+
+	BatchHandle add_batch(MeshHandle mesh_id, unsigned instances)
+	{
+		const MeshData& mesh = m_meshes[mesh_id];
+
+		glDrawElementsIndirectCommand cmd;
+		cmd.firstIndex = mesh.first_index;
+		cmd.count = mesh.indices_count;
+		cmd.baseVertex = mesh.first_vertex;
+		cmd.baseInstance = m_instances;
+		cmd.primCount = instances;
+
+		m_instances += instances;
+		m_commands.push_back(cmd);
+
+		return std::prev(m_commands.end());
+	}
+
+	void change_batch_mesh(BatchHandle batch_id, MeshHandle mesh_id)
+	{
+		const MeshData& mesh = m_meshes[mesh_id];
+
+		glDrawElementsIndirectCommand& cmd = *batch_id;
+		cmd.firstIndex = mesh.first_index;
+		cmd.count = mesh.indices_count;
+		cmd.baseVertex = mesh.first_vertex;
+	}
+private:
+	size_t get_total_vertices(const std::vector<Mesh>& meshes)
+	{
+		size_t result = 0;
+		for (const auto& mesh : meshes)
+		{
+			result += mesh.vertices.size();
+		}
+	}
+	size_t get_total_indices(const std::vector<Mesh>& meshes)
+	{
+		size_t result = 0;
+		for (const auto& mesh : meshes)
+		{
+			result += mesh.indices.size();
+		}
+	}
+public:
+	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes, size_t max_batches) :
+		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size())),
+		texture_num(texture_paths.size()),
+		m_vertices(get_total_vertices(meshes)),
+		m_indices(get_total_indices(meshes)),
+		m_commands()
+	{
+		for (const auto& mesh : meshes)
+			add_mesh(mesh.vertices, mesh.indices);
+
+		Buffer& VBO = m_vertices().get_buffer();
+		Buffer& EBO = m_indices().get_buffer();
 		Buffer& instanced_vbo = get_container(instance_data).get_buffer();
 
 		const unsigned int VBO_IDX = 0;
@@ -89,7 +165,6 @@ public:
 
 		VAO.element_buffer(EBO);
 	}
-
 public:
 	MaterialHandle add_material(const Material& material)
 	{
@@ -104,8 +179,8 @@ public:
 	{
 		unsigned material_idx = &*material - materials.data();
 		auto data_it = instance_data.insert({ glm::mat4(1.0f),  material_idx});
-		builder.add_batch(mesh_id, 1);
-		auto command_it = std::prev(builder.commands().end());
+		add_batch(mesh_id, 1);
+		auto command_it = std::prev(m_commands.end());
 
 		return { data_it, command_it };
 	}
@@ -115,12 +190,12 @@ public:
 	}
 	void set_model_mesh(ModelHandle model_id, MeshHandle mesh)
 	{
-		builder.change_batch_mesh(model_id.second, mesh);
+		change_batch_mesh(model_id.second, mesh);
 	}
 	void remove_model(ModelHandle model_id)
 	{
 		instance_data.erase(model_id.first);
-		const_cast<gpu_unordered_array_set<glDrawElementsIndirectCommand>&>(builder.commands()).erase(model_id.second);
+		const_cast<gpu_unordered_array_set<glDrawElementsIndirectCommand>&>(m_commands).erase(model_id.second);
 	}
 public:
 	size_t texture_count() const
@@ -130,13 +205,13 @@ public:
 public:
 	void draw() const
 	{
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, builder.commands().size(), 0);
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, m_commands.size(), 0);
 	}
 
 	void setup_state()
 	{
 		VAO.bind();
-		get_container(builder.commands()).get_buffer().bind(GL_DRAW_INDIRECT_BUFFER);
+		get_container(m_commands).get_buffer().bind(GL_DRAW_INDIRECT_BUFFER);
 
 		glActiveTexture(GL_TEXTURE0);
 		textures.bind();
