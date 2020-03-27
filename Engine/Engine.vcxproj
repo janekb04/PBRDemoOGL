@@ -14,8 +14,8 @@
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Defines.h" />
-    <ClInclude Include="src\DemoScene.h" />
     <ClInclude Include="src\GPUArray.h" />
+    <ClInclude Include="src\MappedGPUArray.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />
     <ClInclude Include="src\imgui\imgui_impl_glfw.h" />
@@ -37,6 +37,7 @@
     <ClInclude Include="src\Index.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Texture2dArray.h" />
+    <ClInclude Include="src\UnorderedArraySet.h" />
     <ClInclude Include="src\Vertex.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\World.h" />

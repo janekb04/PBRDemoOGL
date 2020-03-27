@@ -8,15 +8,15 @@
 #include "Texture2dArray.h"
 #include "Mesh.h"
 #include "Material.h"
-#include "ArraySet.h"
-#include "GPUArray.h"
+#include "UnorderedArraySet.h"
+#include "MappedGPUArray.h"
 #include "Utility.h"
 
 class Scene
 {
 private:
 	template <typename T>
-	using gpu_array_set = array_set<T, GPUArray<T>>;
+	using gpu_unordered_array_set = unordered_array_set<T, MappedGPUArray<T>>;
 public:
 	struct Model
 	{
@@ -24,54 +24,26 @@ public:
 		int material_idx;
 	};
 private:
-	struct MeshData
-	{
-		Index first_index;
-		Index indices_count;
-		Index first_vertex;
-		Index vertices_count; // currently not needed, kept for future (for example mesh removal)
-	};
-private:
+	using MeshData = MeshBuilder<Vertex, GLuint>::MeshData;
 	std::vector<MeshData> m_meshes;
-	GPUArray<Vertex> m_vertices;
-	GPUArray<Index> m_indices;
-	gpu_array_set<glDrawElementsIndirectCommand> m_commands;
+	Buffer VBO;
+	Buffer EBO;
+	gpu_unordered_array_set<glDrawElementsIndirectCommand> m_commands;
 	unsigned m_instances;
 
 	VertexArray VAO;
 	Texture2dArray textures;
 	size_t texture_num;
 
-	gpu_array_set<Model> instance_data;
-	GPUArray<Material> materials;
+	gpu_unordered_array_set<Model> instance_data;
+	MappedGPUArray<Material> materials;
 public:
-	using MaterialHandle = typename GPUArray<Material>::iterator;
-	using ModelHandle = std::pair<typename gpu_array_set<Model>::iterator, gpu_array_set<glDrawElementsIndirectCommand>::iterator>;
+	using MaterialHandle = typename MappedGPUArray<Material>::iterator;
+	using ModelHandle = std::pair<typename gpu_unordered_array_set<Model>::iterator, gpu_unordered_array_set<glDrawElementsIndirectCommand>::iterator>;
 	using MeshHandle = unsigned;
 	using TextureHandle = unsigned;
-	using BatchHandle = typename decltype(m_commands)::iterator;
+	using BatchHandle = typename gpu_unordered_array_set<glDrawElementsIndirectCommand>::iterator;
 private:
-	MeshHandle add_mesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices)
-	{
-		MeshData mesh;
-		mesh.first_index = m_indices.size();
-		mesh.indices_count = indices.size();
-		mesh.first_vertex = m_vertices.size();
-		mesh.first_vertex = m_vertices.size();
-
-		for (const auto& v : vertices)
-		{
-			m_vertices.push_back(v);
-		}
-		for (const auto& i : indices)
-		{
-			m_indices.push_back(i);
-		}
-		m_meshes.push_back(mesh);
-
-		return m_meshes.size() - 1;
-	}
-
 	BatchHandle add_batch(MeshHandle mesh_id, unsigned instances)
 	{
 		const MeshData& mesh = m_meshes[mesh_id];
@@ -99,44 +71,30 @@ private:
 		cmd.baseVertex = mesh.first_vertex;
 	}
 private:
-	static size_t get_total_vertices(const std::vector<Mesh>& meshes)
-	{
-		size_t result = 0;
-		for (const auto& mesh : meshes)
-		{
-			result += mesh.vertices.size();
-		}
-		return result;
-	}
-	static size_t get_total_indices(const std::vector<Mesh>& meshes)
-	{
-		size_t result = 0;
-		for (const auto& mesh : meshes)
-		{
-			result += mesh.indices.size();
-		}
-		return result;
-	}
 	template <typename T>
-	static GPUArray<T> create_preallocated_gpu_array(size_t max_batches)
+	static MappedGPUArray<T> create_preallocated_gpu_array(size_t max_batches)
 	{
-		return GPUArray<T>(max_batches);
+		return MappedGPUArray<T>(max_batches);
 	}
 public:
 	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes, size_t max_batches, size_t max_models, size_t max_materials) :
 		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size())),
 		texture_num(texture_paths.size()),
-		m_vertices(get_total_vertices(meshes)),
-		m_indices(get_total_indices(meshes)),
 		m_commands(create_preallocated_gpu_array<glDrawElementsIndirectCommand>(max_batches)),
 		instance_data(create_preallocated_gpu_array<Model>(max_models)),
 		materials(create_preallocated_gpu_array<Material>(max_materials))
 	{
-		for (const auto& mesh : meshes)
-			add_mesh(mesh.vertices, mesh.indices);
+		{
+			MeshBuilder<Vertex, unsigned> builder;
+		
+			for (const auto& mesh : meshes)
+				builder.add_mesh(mesh.vertices, mesh.indices);
 
-		Buffer& VBO = m_vertices.get_buffer();
-		Buffer& EBO = m_indices.get_buffer();
+			VBO.storage(sizeof(Vertex) * builder.vertices().size(), builder.vertices().data(), 0);
+			EBO.storage(sizeof(GLuint) * builder.indices().size(), builder.indices().data(), 0);
+			m_meshes = builder.mesh_data();
+		}
+
 		Buffer& instanced_vbo = get_container(instance_data).get_buffer();
 
 		const unsigned int VBO_IDX = 0;
@@ -210,7 +168,7 @@ public:
 	void remove_model(ModelHandle model_id)
 	{
 		instance_data.erase(model_id.first);
-		const_cast<gpu_array_set<glDrawElementsIndirectCommand>&>(m_commands).erase(model_id.second);
+		const_cast<gpu_unordered_array_set<glDrawElementsIndirectCommand>&>(m_commands).erase(model_id.second);
 	}
 public:
 	size_t texture_count() const

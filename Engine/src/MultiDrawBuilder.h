@@ -5,14 +5,11 @@
 
 template <
 	typename Vertex,
-	typename Index,
-	template<typename> typename VerticesContainer = std::vector,
-	template<typename> typename IndicesContainer = std::vector,
-	template<typename> typename CommandsContainer = std::vector
+	typename Index
 >
-class MultiDrawElementsBuilder
+class MeshBuilder
 {
-private:
+public:
 	struct MeshData
 	{
 		Index first_index;
@@ -22,18 +19,12 @@ private:
 	};
 private:
 	std::vector<MeshData> m_meshes;
-	VerticesContainer<Vertex> m_vertices;
-	IndicesContainer<Index> m_indices;
-	CommandsContainer<glDrawElementsIndirectCommand> m_commands;
-	unsigned m_instances;
+	std::vector<Vertex> m_vertices;
+	std::vector<Index> m_indices;
 public:
 	using MeshID = unsigned;
-	using BatchID = typename decltype(m_commands)::iterator;
 public:
-	MultiDrawElementsBuilder() :
-		m_instances(0)
-	{
-	}
+	MeshBuilder() = default;
 
 	MeshID add_mesh(const std::vector<Vertex>& vertices, const std::vector<Index>& indices)
 	{
@@ -50,50 +41,18 @@ public:
 		return m_meshes.size() - 1;
 	}
 
-	BatchID add_batch(MeshID mesh_id, unsigned instances)
-	{
-		const MeshData& mesh = m_meshes[mesh_id];
-		
-		glDrawElementsIndirectCommand cmd;
-		cmd.firstIndex = mesh.first_index;
-		cmd.count = mesh.indices_count;
-		cmd.baseVertex = mesh.first_vertex;
-		cmd.baseInstance = m_instances;
-		cmd.primCount = instances;
-
-		m_instances += instances;
-		m_commands.push_back(cmd);
-		
-		return std::prev(m_commands.end());
-	}
-
-	void change_batch_mesh(BatchID batch_id, MeshID mesh_id)
-	{
-		const MeshData& mesh = m_meshes[mesh_id];
-
-		glDrawElementsIndirectCommand& cmd = *batch_id;
-		cmd.firstIndex = mesh.first_index;
-		cmd.count = mesh.indices_count;
-		cmd.baseVertex = mesh.first_vertex;
-	}
-
-	const VerticesContainer<Vertex>& vertices() const
+	const std::vector<Vertex>& vertices() const
 	{
 		return m_vertices;
 	}
 
-	const IndicesContainer<Index>& indices() const
+	const std::vector<Index>& indices() const
 	{
 		return m_indices;
 	}
 
-	const CommandsContainer<glDrawElementsIndirectCommand>& commands() const
+	const std::vector<MeshData>& mesh_data() const
 	{
-		return m_commands;
-	}
-
-	unsigned total_instances() const
-	{
-		return m_instances;
+		return m_meshes;
 	}
 };

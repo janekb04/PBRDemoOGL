@@ -13,6 +13,11 @@ private:
 		return handle;
 	}
 public:
+	static void copy_sub_data(const Buffer& source, const Buffer& target, size_t read_offset, size_t write_offset, size_t size)
+	{
+		glCopyNamedBufferSubData(source.handle, target.handle, read_offset, write_offset, size);
+	}
+public:
 	Buffer() :
 		handle{ create_handle() }
 	{
@@ -39,6 +44,11 @@ public:
 	void* map_range(size_t offset, size_t length, GLbitfield access) const
 	{
 		return glMapNamedBufferRange(handle, offset, length, access);
+	}
+
+	void sub_data(size_t offset, size_t size, const void* data)
+	{
+		glNamedBufferSubData(handle, offset, size, data);
 	}
 
 	void unmap()

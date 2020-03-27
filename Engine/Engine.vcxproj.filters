@@ -90,9 +90,6 @@
     <ClInclude Include="src\OpenGLWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DemoScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Texture2dArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -111,10 +108,16 @@
     <ClInclude Include="src\TestScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GPUArray.h">
+    <ClInclude Include="src\ArraySet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ArraySet.h">
+    <ClInclude Include="src\UnorderedArraySet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MappedGPUArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GPUArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

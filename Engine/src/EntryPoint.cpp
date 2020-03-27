@@ -7,7 +7,6 @@
 #include "Defines.h"
 #include "Camera.h"
 #include "OpenGLWindow.h"
-#include "DemoScene.h"
 #include "OrbitCamera.h"
 #include "TestScene.h"
 
@@ -16,7 +15,7 @@ int main()
     WindowManager::init();
 	OpenGLWindow wnd;
 
-	WindowManager::set_swap_interval(1);
+	WindowManager::set_swap_interval(0);
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -28,7 +27,7 @@ int main()
 	};
     
 	//DemoScene scene;
-	auto scene = create_test_scene(100000);
+	auto scene = create_test_scene(100'000);
 
 	PerspectiveCamera camera;
 	Uniform camera_mat = lit.get_uniform_location("a_camera");

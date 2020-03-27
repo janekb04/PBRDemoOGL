@@ -5,8 +5,10 @@
 #include "Buffer.h"
 
 template <typename T>
-class GPUArray
+class MappedGPUArray
 {
+private:
+	static constexpr GLbitfield BUFFER_FLAGS = GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT | GL_MAP_READ_BIT;
 public:
 	using value_type = T;
 	using size_type = std::size_t;
@@ -23,43 +25,71 @@ private:
 	size_type m_size;
 	size_type m_capacity;
 	Buffer m_buffer;
+	pointer m_data_ptr;
 private:
-	void allocate_buffer(size_t size) const
+	void* allocate_and_map_buffer(size_t size, const void* const data) const
 	{
 		size_t size_in_basic_machine_units = size * sizeof(T);
-		m_buffer.storage(size_in_basic_machine_units * sizeof(T), nullptr, 0);
+		m_buffer.storage(size_in_basic_machine_units * sizeof(T), data, BUFFER_FLAGS);
+		return m_buffer.map_range(0, size_in_basic_machine_units, BUFFER_FLAGS);
 	}
 public:
-	GPUArray(size_type count) : // only allocates
+	MappedGPUArray(size_type count) : // only allocates
 		m_size{ 0 },
 		m_capacity{ count },
-		m_buffer{}
+		m_buffer{},
+		m_data_ptr{ static_cast<pointer>(allocate_and_map_buffer(m_capacity, nullptr)) }
 	{
-		allocate_buffer(m_capacity);
 	}
 
-	GPUArray(const GPUArray& other) :
+	MappedGPUArray(size_type count, const_reference value) :
+		m_size{ count },
+		m_capacity{ count },
+		m_buffer{},
+		m_data_ptr{ static_cast<pointer>(allocate_and_map_buffer(m_capacity, nullptr)) }
+	{
+		std::uninitialized_fill_n(m_data_ptr, count, value);
+	}
+	template< class InputIt >
+	MappedGPUArray(InputIt first, InputIt last) :
+		m_size{ std::distance(first, last) },
+		m_capacity{ m_size },
+		m_buffer{},
+		m_data_ptr{ static_cast<pointer>(allocate_and_map_buffer(m_capacity, nullptr)) }
+	{
+		std::uninitialized_copy(first, last, m_data_ptr);
+	}
+	MappedGPUArray(const MappedGPUArray& other) :
 		m_size{ other.m_size },
 		m_capacity{ other.m_capacity },
-		m_buffer{}
+		m_buffer{},
+		m_data_ptr{ static_cast<pointer>(allocate_and_map_buffer(m_capacity, other.m_data_ptr)) }
 	{
-		allocate_buffer(m_capacity);
-		Buffer::copy_sub_data(other.m_buffer, m_buffer, 0, 0, m_size);
 	}
 
-	GPUArray(GPUArray&& other) noexcept :
-		m_size{ other.m_size },
-		m_capacity{ other.m_capacity },
-		m_buffer{ std::move(other.m_buffer) }
+	MappedGPUArray(MappedGPUArray&& other) noexcept :
+		m_size{other.m_size},
+		m_capacity{other.m_capacity},
+		m_buffer{ std::move(other.m_buffer) },
+		m_data_ptr{ other.m_data_ptr }
 	{
 		other.m_size = 0;
 		other.m_capacity = 0;
+		other.m_data_ptr = nullptr;
 	}
-	~GPUArray() = default;
+	MappedGPUArray(std::initializer_list<T> init) :
+		MappedGPUArray(init.begin(), init.end())
+	{
+	}
+	~MappedGPUArray()
+	{
+		if (!m_buffer.is_null())
+			m_buffer.unmap();
+	}
 
-	GPUArray& operator=(const GPUArray& other);
-	GPUArray& operator=(GPUArray&& other) noexcept;
-	GPUArray& operator=(std::initializer_list<T> init);
+	MappedGPUArray& operator=(const MappedGPUArray& other);
+	MappedGPUArray& operator=(MappedGPUArray&& other) noexcept;
+	MappedGPUArray& operator=(std::initializer_list<T> init);
 
 	void assign(size_type count, const_reference value);
 	template<class InputIt>
@@ -202,7 +232,7 @@ public:
 	void resize(size_type count);
 	void resize(size_type count, const value_type& value);
 
-	void swap(GPUArray& other) noexcept;
+	void swap(MappedGPUArray& other) noexcept;
 
 	Buffer& get_buffer()
 	{
