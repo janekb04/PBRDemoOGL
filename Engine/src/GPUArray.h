@@ -83,7 +83,8 @@ public:
 	}
 	~GPUArray()
 	{
-		m_buffer.unmap();
+		if (!m_buffer.is_null())
+			m_buffer.unmap();
 	}
 
 	GPUArray& operator=(const GPUArray& other);
@@ -98,8 +99,14 @@ public:
 	reference at(size_type pos);
 	const_reference at(size_type pos) const;
 
-	reference operator[](size_type pos);
-	const_reference operator[](size_type pos) const;
+	reference operator[](size_type pos)
+	{
+		return m_data_ptr[pos];
+	}
+	const_reference operator[](size_type pos) const
+	{
+		return m_data_ptr[pos];
+	}
 
 	reference front();
 	const_reference front() const;
@@ -191,26 +198,33 @@ public:
 	iterator erase(const_iterator pos);
 	iterator erase(const_iterator first, const_iterator last);
 
-	void push_back(const T& value)
+	iterator push_back(const T& value)
 	{
+		assert(m_size < m_capacity);
 		construct_at(m_data_ptr + m_size, value);
 		++m_size;
+		return std::prev(end());
 	}
-	void push_back(T&& value)
+	iterator push_back(T&& value)
 	{
+		assert(m_size < m_capacity);
 		construct_at(m_data_ptr + m_size, std::move(value));
 		++m_size;
+		return std::prev(end());
 	}
 
 	template< class... Args >
 	reference emplace_back(Args&&... args)
 	{
+		assert(m_size < m_capacity);
 		construct_at(m_data_ptr + m_size, std::forward<Args>(args)...);
 		++m_size;
+		return *std::prev(end());
 	}
 
 	void pop_back()
 	{
+		assert(m_size > 0);
 		std::destroy_at(std::prev(end()));
 		--m_size;
 	}

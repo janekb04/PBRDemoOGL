@@ -9,6 +9,7 @@
 #include "OpenGLWindow.h"
 #include "DemoScene.h"
 #include "OrbitCamera.h"
+#include "TestScene.h"
 
 int main()
 {
@@ -26,8 +27,9 @@ int main()
 		Shader{read_file("res/lit.frag").c_str(), GL_FRAGMENT_SHADER}
 	};
     
-	DemoScene scene;
-    
+	//DemoScene scene;
+	auto scene = create_test_scene(100000);
+
 	PerspectiveCamera camera;
 	Uniform camera_mat = lit.get_uniform_location("a_camera");
 	OrbitCamera controller(camera.transform);
@@ -51,8 +53,8 @@ int main()
 			lit.use();
 			lit.uniform(camera_mat, false, camera.get_projection_matrix(wnd.viewport()) * camera.get_view_matrix());
 
-			scene.setup_state();
-			scene.draw();
+			scene->setup_state();
+			scene->draw();
 		}
 
 		wnd.end_frame();

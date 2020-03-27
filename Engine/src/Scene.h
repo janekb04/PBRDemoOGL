@@ -46,7 +46,7 @@ private:
 	GPUArray<Material> materials;
 public:
 	using MaterialHandle = typename GPUArray<Material>::iterator;
-	using ModelHandle = std::pair<typename unordered_array_set<Model>::iterator, gpu_unordered_array_set<glDrawElementsIndirectCommand>::iterator>;
+	using ModelHandle = std::pair<typename gpu_unordered_array_set<Model>::iterator, gpu_unordered_array_set<glDrawElementsIndirectCommand>::iterator>;
 	using MeshHandle = unsigned;
 	using TextureHandle = unsigned;
 	using BatchHandle = typename decltype(m_commands)::iterator;
@@ -59,8 +59,14 @@ private:
 		mesh.first_vertex = m_vertices.size();
 		mesh.first_vertex = m_vertices.size();
 
-		m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
-		m_indices.insert(m_indices.end(), indices.begin(), indices.end());
+		for (const auto& v : vertices)
+		{
+			m_vertices.push_back(v);
+		}
+		for (const auto& i : indices)
+		{
+			m_indices.push_back(i);
+		}
 		m_meshes.push_back(mesh);
 
 		return m_meshes.size() - 1;
@@ -93,35 +99,44 @@ private:
 		cmd.baseVertex = mesh.first_vertex;
 	}
 private:
-	size_t get_total_vertices(const std::vector<Mesh>& meshes)
+	static size_t get_total_vertices(const std::vector<Mesh>& meshes)
 	{
 		size_t result = 0;
 		for (const auto& mesh : meshes)
 		{
 			result += mesh.vertices.size();
 		}
+		return result;
 	}
-	size_t get_total_indices(const std::vector<Mesh>& meshes)
+	static size_t get_total_indices(const std::vector<Mesh>& meshes)
 	{
 		size_t result = 0;
 		for (const auto& mesh : meshes)
 		{
 			result += mesh.indices.size();
 		}
+		return result;
+	}
+	template <typename T>
+	static GPUArray<T> create_preallocated_gpu_array(size_t max_batches)
+	{
+		return GPUArray<T>(max_batches);
 	}
 public:
-	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes, size_t max_batches) :
+	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes, size_t max_batches, size_t max_models, size_t max_materials) :
 		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size())),
 		texture_num(texture_paths.size()),
 		m_vertices(get_total_vertices(meshes)),
 		m_indices(get_total_indices(meshes)),
-		m_commands()
+		m_commands(create_preallocated_gpu_array<glDrawElementsIndirectCommand>(max_batches)),
+		instance_data(create_preallocated_gpu_array<Model>(max_models)),
+		materials(create_preallocated_gpu_array<Material>(max_materials))
 	{
 		for (const auto& mesh : meshes)
 			add_mesh(mesh.vertices, mesh.indices);
 
-		Buffer& VBO = m_vertices().get_buffer();
-		Buffer& EBO = m_indices().get_buffer();
+		Buffer& VBO = m_vertices.get_buffer();
+		Buffer& EBO = m_indices.get_buffer();
 		Buffer& instanced_vbo = get_container(instance_data).get_buffer();
 
 		const unsigned int VBO_IDX = 0;
@@ -178,7 +193,7 @@ public:
 	ModelHandle add_model(MeshHandle mesh_id, MaterialHandle material)
 	{
 		unsigned material_idx = &*material - materials.data();
-		auto data_it = instance_data.insert({ glm::mat4(1.0f),  material_idx});
+		auto data_it = instance_data.insert({ glm::mat4(1.0f),  (int)material_idx});
 		add_batch(mesh_id, 1);
 		auto command_it = std::prev(m_commands.end());
 
@@ -212,6 +227,8 @@ public:
 	{
 		VAO.bind();
 		get_container(m_commands).get_buffer().bind(GL_DRAW_INDIRECT_BUFFER);
+		const unsigned MATERIAL_SSBO_IDX = 0;
+		materials.get_buffer().bind_base(GL_SHADER_STORAGE_BUFFER, MATERIAL_SSBO_IDX);
 
 		glActiveTexture(GL_TEXTURE0);
 		textures.bind();

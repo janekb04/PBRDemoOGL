@@ -38,7 +38,7 @@ public:
 
 	void* map_range(size_t offset, size_t length, GLbitfield access) const
 	{
-		glMapNamedBufferRange(handle, offset, length, access);
+		return glMapNamedBufferRange(handle, offset, length, access);
 	}
 
 	void unmap()
@@ -60,6 +60,11 @@ public:
 	void bind_base(GLenum target, unsigned index)
 	{
 		glBindBufferBase(target, index, handle);
+	}
+	
+	bool is_null() const
+	{
+		return handle == 0;
 	}
 
 	~Buffer()

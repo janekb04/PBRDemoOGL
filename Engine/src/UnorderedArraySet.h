@@ -29,10 +29,10 @@ private:
 		}
 		friend class unordered_array_set<T, Container>;
 	public:
-		using difference_type = size_t;
-		using value_type = It::value_type;
-		using pointer = It::pointer;
-		using reference = It::reference;
+		using difference_type = typename It::difference_type;
+		using value_type = typename It::value_type;
+		using pointer = typename It::pointer;
+		using reference = typename It::reference;
 		using iterator_category = std::bidirectional_iterator_tag;
 	public:
 		_generic_iterator() :
@@ -94,21 +94,29 @@ public:
 	using container_type = Container;
 	using size_type = std::size_t;
 	using value_type = T;
+	using reference = value_type&;
+	using const_reference = const value_type&;
 	using iterator = _generic_iterator<typename iter_list_t::iterator, Container>;
 	using const_iterator = _generic_iterator<typename iter_list_t::const_iterator, const Container>;
 	using reverse_iterator = _generic_iterator<typename iter_list_t::reverse_iterator, Container>;
 	using const_reverse_iterator = _generic_iterator<typename iter_list_t::const_reverse_iterator, const Container>;
 private:
-	iterator _after_insert()
+	iterator _after_insert(size_type pos)
 	{
-		m_iterators.push_back(c.size() - 1);
+		m_iterators.push_back(pos);
 		auto it = std::prev(m_iterators.end());
 		m_element_iterators.push_back(it);
 		return { it, &c };
 	}
 public:
 	unordered_array_set() = default;
-	//unordered_array_set(const unordered_array_set<T, Container>& other) = default;
+	unordered_array_set(const unordered_array_set<T, Container>& other)
+	{
+		for (const T& value : other)
+		{
+			insert(value);
+		}
+	}
 	unordered_array_set(unordered_array_set<T, Container>&& other) noexcept = default;
 	unordered_array_set(std::initializer_list<T> init)
 	{
@@ -117,9 +125,22 @@ public:
 			insert(value);
 		}
 	}
+	unordered_array_set(container_type&& container) :
+		c{ std::move(container) }
+	{
+		for (int i = 0; i < c.size(); ++i)
+			_after_insert(i);
+	}
 	~unordered_array_set() = default;
 
-	//unordered_array_set& operator=(const unordered_array_set<T, Container>& other) = default;
+	unordered_array_set& operator=(const unordered_array_set<T, Container>& other)
+	{
+		clear();
+		for (const T& value : other)
+		{
+			insert(value);
+		}
+	}
 	unordered_array_set& operator=(unordered_array_set<T, Container>&& other) noexcept = default;
 
 	iterator begin() noexcept
@@ -222,19 +243,19 @@ public:
 	iterator insert(const value_type& value)
 	{
 		c.push_back(value);
-		return _after_insert();
+		return _after_insert(c.size() - 1);
 	}
 	iterator insert(value_type&& value)
 	{
 		c.push_back(std::move(value));
-		return _after_insert();
+		return _after_insert(c.size() - 1);
 	}
 
 	template<typename... Args>
 	iterator emplace(Args&&... args)
 	{
 		c.emplace_back(std::forward<Args>(args)...);
-		return _after_insert();
+		return _after_insert(c.size() - 1);
 	}
 
 	iterator erase(iterator pos)

@@ -4,22 +4,27 @@
 
 std::unique_ptr<Scene> create_test_scene(int obj_count)
 {
-	std::unique_ptr<Scene> scene { new Scene(
-		{
-			"res/container.png",
-			"res/wood.png",
-			"res/grass.jpg",
-			"res/uv.png",
-			"res/plastic.jpg",
-			"res/cobble.jpg",
-			"res/stone.png",
-			"res/brick.jpg",
-			"res/concrete.jpg"
-		},
+	std::vector<const char*> texture_paths
+	{
+		"res/container.png",
+		"res/wood.png",
+		"res/grass.jpg",
+		"res/uv.png",
+		"res/plastic.jpg",
+		"res/cobble.jpg",
+		"res/stone.png",
+		"res/brick.jpg",
+		"res/concrete.jpg"
+	};
+	std::unique_ptr<Scene> scene{ new Scene(
+		texture_paths,
 		{
 			Mesh::from_file("res/container.obj"),
 			Mesh::from_file("res/Table.obj")
-		}
+		},
+		obj_count,
+		obj_count,
+		texture_paths.size()
 	)};
 
 	std::vector<Scene::MaterialHandle> materials;
@@ -27,8 +32,14 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 	for (int i = 0; i < scene->texture_count(); ++i)
 		materials.push_back(scene->add_material({ i }));
 
+	unsigned side_length = ceil(cbrt(obj_count));
+	unsigned face_size = side_length * side_length;
 	for (int i = 0; i < obj_count; ++i)
-		scene->add_model(i & 2, materials[i % materials.size()]);
+	{
+		Scene::Model& model = scene->get_model(scene->add_model(i & 1, materials[i % materials.size()]));
+		model.model_transform = glm::translate(glm::mat4(1), glm::vec3(i / face_size * 2, (i % face_size) / side_length * 2, (i % face_size) % side_length * 2));
+		model.material_idx = rand() % texture_paths.size();
+	}
 
 	return scene;
 }
