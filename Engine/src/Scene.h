@@ -8,7 +8,7 @@
 #include "Texture2dArray.h"
 #include "Mesh.h"
 #include "Material.h"
-#include "UnorderedArraySet.h"
+#include "ArraySet.h"
 #include "GPUArray.h"
 #include "Utility.h"
 
@@ -16,7 +16,7 @@ class Scene
 {
 private:
 	template <typename T>
-	using gpu_unordered_array_set = unordered_array_set<T, GPUArray<T>>;
+	using gpu_array_set = array_set<T, GPUArray<T>>;
 public:
 	struct Model
 	{
@@ -35,18 +35,18 @@ private:
 	std::vector<MeshData> m_meshes;
 	GPUArray<Vertex> m_vertices;
 	GPUArray<Index> m_indices;
-	gpu_unordered_array_set<glDrawElementsIndirectCommand> m_commands;
+	gpu_array_set<glDrawElementsIndirectCommand> m_commands;
 	unsigned m_instances;
 
 	VertexArray VAO;
 	Texture2dArray textures;
 	size_t texture_num;
 
-	gpu_unordered_array_set<Model> instance_data;
+	gpu_array_set<Model> instance_data;
 	GPUArray<Material> materials;
 public:
 	using MaterialHandle = typename GPUArray<Material>::iterator;
-	using ModelHandle = std::pair<typename gpu_unordered_array_set<Model>::iterator, gpu_unordered_array_set<glDrawElementsIndirectCommand>::iterator>;
+	using ModelHandle = std::pair<typename gpu_array_set<Model>::iterator, gpu_array_set<glDrawElementsIndirectCommand>::iterator>;
 	using MeshHandle = unsigned;
 	using TextureHandle = unsigned;
 	using BatchHandle = typename decltype(m_commands)::iterator;
@@ -210,7 +210,7 @@ public:
 	void remove_model(ModelHandle model_id)
 	{
 		instance_data.erase(model_id.first);
-		const_cast<gpu_unordered_array_set<glDrawElementsIndirectCommand>&>(m_commands).erase(model_id.second);
+		const_cast<gpu_array_set<glDrawElementsIndirectCommand>&>(m_commands).erase(model_id.second);
 	}
 public:
 	size_t texture_count() const

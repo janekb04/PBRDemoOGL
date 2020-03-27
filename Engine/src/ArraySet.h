@@ -7,7 +7,7 @@
 #include <algorithm>
 
 template <typename T, typename Container = std::vector<T>>
-class unordered_array_set
+class array_set
 {
 protected:
 	Container c;
@@ -27,7 +27,7 @@ private:
 		{
 			return m_it;
 		}
-		friend class unordered_array_set<T, Container>;
+		friend class array_set<T, Container>;
 	public:
 		using difference_type = typename It::difference_type;
 		using value_type = typename It::value_type;
@@ -109,31 +109,31 @@ private:
 		return { it, &c };
 	}
 public:
-	unordered_array_set() = default;
-	unordered_array_set(const unordered_array_set<T, Container>& other)
+	array_set() = default;
+	array_set(const array_set<T, Container>& other)
 	{
 		for (const T& value : other)
 		{
 			insert(value);
 		}
 	}
-	unordered_array_set(unordered_array_set<T, Container>&& other) noexcept = default;
-	unordered_array_set(std::initializer_list<T> init)
+	array_set(array_set<T, Container>&& other) noexcept = default;
+	array_set(std::initializer_list<T> init)
 	{
 		for (const T& value : init)
 		{
 			insert(value);
 		}
 	}
-	unordered_array_set(container_type&& container) :
+	array_set(container_type&& container) :
 		c{ std::move(container) }
 	{
 		for (int i = 0; i < c.size(); ++i)
 			_after_insert(i);
 	}
-	~unordered_array_set() = default;
+	~array_set() = default;
 
-	unordered_array_set& operator=(const unordered_array_set<T, Container>& other)
+	array_set& operator=(const array_set<T, Container>& other)
 	{
 		clear();
 		for (const T& value : other)
@@ -141,7 +141,7 @@ public:
 			insert(value);
 		}
 	}
-	unordered_array_set& operator=(unordered_array_set<T, Container>&& other) noexcept = default;
+	array_set& operator=(array_set<T, Container>&& other) noexcept = default;
 
 	iterator begin() noexcept
 	{
@@ -304,7 +304,7 @@ public:
 		erase(std::prev(end()));
 	}
 
-	void swap(unordered_array_set<T, Container>& other)
+	void swap(array_set<T, Container>& other)
 	{
 		c.swap(other.c);
 		m_iterators.swap(other.m_iterators);

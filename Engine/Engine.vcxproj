@@ -31,7 +31,7 @@
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\TestScene.h" />
-    <ClInclude Include="src\UnorderedArraySet.h" />
+    <ClInclude Include="src\ArraySet.h" />
     <ClInclude Include="src\Texture2d.h" />
     <ClInclude Include="src\MultiDrawBuilder.h" />
     <ClInclude Include="src\Index.h" />
