@@ -247,8 +247,6 @@ public:
 	void unmap()
 	{
 		m_buffer.unmap();
-		m_size = 0;
-		m_capacity = 0;
 		m_data_ptr = nullptr;
 	}
 };

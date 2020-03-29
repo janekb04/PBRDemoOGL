@@ -27,7 +27,7 @@ int main()
 	};
     
 	//DemoScene scene;
-	auto scene = create_test_scene(100'000);
+	auto scene = create_test_scene(1'000'000);
 
 	PerspectiveCamera camera;
 	Uniform camera_mat = lit.get_uniform_location("a_camera");

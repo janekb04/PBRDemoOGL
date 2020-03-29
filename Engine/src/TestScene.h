@@ -23,7 +23,6 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 			Mesh::from_file("res/Table.obj")
 		},
 		obj_count,
-		obj_count,
 		texture_paths.size()
 	)};
 
@@ -36,9 +35,11 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 	unsigned face_size = side_length * side_length;
 	for (int i = 0; i < obj_count; ++i)
 	{
-		Scene::Model& model = scene->get_model(scene->add_model(i & 1, materials[i % materials.size()]));
+		Scene::Model model;
 		model.model_transform = glm::translate(glm::mat4(1), glm::vec3(i / face_size * 2, (i % face_size) / side_length * 2, (i % face_size) % side_length * 2));
 		model.material_idx = rand() % texture_paths.size();
+
+		scene->add_model(i & 1, model);
 	}
 
 	return scene;

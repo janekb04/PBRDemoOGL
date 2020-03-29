@@ -51,6 +51,11 @@ public:
 		glNamedBufferSubData(handle, offset, size, data);
 	}
 
+	void get_sub_data(size_t offset, size_t size, void* data)
+	{
+		glGetNamedBufferSubData(handle, offset, size, data);
+	}
+
 	void unmap()
 	{
 		if (!glUnmapNamedBuffer(handle))

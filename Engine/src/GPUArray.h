@@ -15,10 +15,6 @@ public:
 	using const_reference = const value_type&;
 	using pointer = value_type*;
 	using const_pointer = const value_type*;
-	using iterator = pointer;
-	using const_iterator = const_pointer;
-	using reverse_iterator = std::reverse_iterator<iterator>;
-	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 private:
 	size_type m_size;
 	size_type m_capacity;
@@ -66,67 +62,6 @@ public:
 	void assign(InputIt first, InputIt last);
 	void assign(std::initializer_list<T> ilist);
 
-	reference at(size_type pos);
-	const_reference at(size_type pos) const;
-
-	reference operator[](size_type pos)
-	{
-		return m_data_ptr[pos];
-	}
-	const_reference operator[](size_type pos) const
-	{
-		return m_data_ptr[pos];
-	}
-
-	reference front();
-	const_reference front() const;
-
-	reference back();
-	const_reference back() const;
-
-	T* data() noexcept
-	{
-		return m_data_ptr;
-	}
-	const T* data() const noexcept
-	{
-		return m_data_ptr;
-	}
-
-	iterator begin() noexcept
-	{
-		return m_data_ptr;
-	}
-	const_iterator begin() const noexcept
-	{
-		return m_data_ptr;
-	}
-	const_iterator cbegin() const noexcept
-	{
-		return m_data_ptr;
-	}
-
-	iterator end() noexcept
-	{
-		return m_data_ptr + m_size;
-	}
-	const_iterator end() const noexcept
-	{
-		return m_data_ptr + m_size;
-	}
-	const_iterator cend() const noexcept
-	{
-		return m_data_ptr + m_size;
-	}
-
-	reverse_iterator rbegin() noexcept;
-	const_reverse_iterator rbegin() const noexcept;
-	const_reverse_iterator crbegin() const noexcept;
-
-	reverse_iterator rend() noexcept;
-	const_reverse_iterator rend() const noexcept;
-	const_reverse_iterator crend() const noexcept;
-
 	bool empty() const noexcept
 	{
 		return m_size == 0;
@@ -153,20 +88,20 @@ public:
 		m_size = 0;
 	}
 
-	iterator insert(const_iterator pos, const T& value);
-	iterator insert(const_iterator pos, T&& value);
-	iterator insert(const_iterator pos, size_type count, const T& value);
+	void insert(const_iterator pos, const T& value);
+	void insert(const_iterator pos, T&& value);
+	void insert(const_iterator pos, size_type count, const T& value);
 	template< class InputIt >
 	void insert(iterator pos, InputIt first, InputIt last);
 	template< class InputIt >
-	iterator insert(const_iterator pos, InputIt first, InputIt last);
-	iterator insert(const_iterator pos, std::initializer_list<T> ilist);
+	void insert(const_iterator pos, InputIt first, InputIt last);
+	void insert(const_iterator pos, std::initializer_list<T> ilist);
 
 	template< class... Args >
-	iterator emplace(const_iterator pos, Args&&... args);
+	void emplace(const_iterator pos, Args&&... args);
 
-	iterator erase(const_iterator pos);
-	iterator erase(const_iterator first, const_iterator last);
+	void erase(const_iterator pos);
+	void erase(const_iterator first, const_iterator last);
 
 	iterator push_back(const T& value)
 	{
