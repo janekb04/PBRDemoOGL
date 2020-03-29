@@ -97,6 +97,11 @@ public:
 		glProgramUniformMatrix4fv(handle, uniform.index(), 1, transpose, glm::value_ptr(matrix));
 	}
 
+	void uniform(Uniform uniform, const glm::vec3& vec) const
+	{
+		glProgramUniform3fv(handle, uniform.index(), 1, &vec[0]);
+	}
+
 	VertexAttribute get_attrib_location(const char* const name)
 	{
 		int location = glGetAttribLocation(handle, name);

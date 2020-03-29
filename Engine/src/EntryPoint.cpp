@@ -15,7 +15,7 @@ int main()
     WindowManager::init();
 	OpenGLWindow wnd;
 
-	WindowManager::set_swap_interval(0);
+	WindowManager::set_swap_interval(1);
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -27,11 +27,16 @@ int main()
 	};
     
 	//DemoScene scene;
-	auto scene = create_test_scene(1'000'000);
+	auto scene = create_test_scene(8);
 
 	PerspectiveCamera camera;
-	Uniform camera_mat = lit.get_uniform_location("a_camera");
+	Uniform a_camera = lit.get_uniform_location("a_camera");
+	Uniform a_view = lit.get_uniform_location("a_view");
 	OrbitCamera controller(camera.transform);
+
+	Uniform a_light_dir = lit.get_uniform_location("a_light_dir");
+	Uniform a_light_color = lit.get_uniform_location("a_light_color");
+	Uniform a_ambient = lit.get_uniform_location("a_ambient");
 
 	double old_time = WindowManager::get_time();
 	double delta_time = 0;
@@ -50,7 +55,17 @@ int main()
 		//draw
 		{
 			lit.use();
-			lit.uniform(camera_mat, false, camera.get_projection_matrix(wnd.viewport()) * camera.get_view_matrix());
+			auto view = camera.get_view_matrix();
+			lit.uniform(a_camera, false, camera.get_projection_matrix(wnd.viewport()) * view);
+			lit.uniform(a_view, false, view);
+
+			
+			glm::vec3 dir = glm::normalize(view * glm::vec4(-1, 0, 0, 0));
+			lit.uniform(a_light_dir, dir);
+			lit.uniform(a_light_color, glm::vec3(1, 1, 1));
+			lit.uniform(a_ambient, glm::vec3(0.2f, 0.3f, 0.3f));
+
+
 
 			scene->setup_state();
 			scene->draw();

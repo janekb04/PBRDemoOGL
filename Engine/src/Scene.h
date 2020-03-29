@@ -19,6 +19,7 @@ public:
 	{
 		glm::mat4 model_transform;
 		int material_idx;
+		glm::mat3 normal_mat;
 	};
 private:
 	using MeshData = MeshBuilder<Vertex, GLuint>::MeshData;
@@ -124,6 +125,7 @@ public:
 		const unsigned int INSTANCED_VBO_IDX = 1;
 		VAO.vertex_buffer(INSTANCED_VBO_IDX, instance_data, 0, sizeof(Model));
 		VAO.binding_divisor(INSTANCED_VBO_IDX, 1);
+
 		const VertexAttribute MODEL_IDX{ 4 };
 		for (int i = 0; i < 4; ++i)
 		{
@@ -132,10 +134,20 @@ public:
 			VAO.attrib_binding(column, INSTANCED_VBO_IDX);
 			VAO.attrib_format(column, 4, GL_FLOAT, GL_FALSE, offsetof(Model, model_transform) + sizeof(glm::mat4::col_type) * i);
 		}
+
 		const VertexAttribute MATERIAL_IDX_IDX{ 8 };
 		VAO.enable_attrib(MATERIAL_IDX_IDX);
 		VAO.attrib_binding(MATERIAL_IDX_IDX, INSTANCED_VBO_IDX);
 		VAO.attrib_format_i(MATERIAL_IDX_IDX, 1, GL_INT, offsetof(Model, material_idx));
+
+		const VertexAttribute NORMAL_MAT_IDX{ 9 };
+		for (int i = 0; i < 3; ++i)
+		{
+			VertexAttribute column{ NORMAL_MAT_IDX.index() + i };
+			VAO.enable_attrib(column);
+			VAO.attrib_binding(column, INSTANCED_VBO_IDX);
+			VAO.attrib_format(column, 4, GL_FLOAT, GL_FALSE, offsetof(Model, normal_mat) + sizeof(glm::mat4::col_type) * i);
+		}
 
 		VAO.element_buffer(EBO);
 	}

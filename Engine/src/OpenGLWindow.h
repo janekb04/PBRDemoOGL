@@ -112,6 +112,8 @@ class OpenGLWindow : public Window
 
 		if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
 			throw std::runtime_error(message);
+		else
+			std::clog << message << '\n';
 	}
 	static CreationHints create_hints()
 	{

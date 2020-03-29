@@ -37,7 +37,9 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 	{
 		Scene::Model model;
 		model.model_transform = glm::translate(glm::mat4(1), glm::vec3(i / face_size * 2, (i % face_size) / side_length * 2, (i % face_size) % side_length * 2));
+		//model.model_transform = glm::rotate(model.model_transform, glm::radians<float>(rand() % 360), glm::vec3(0, 1, 0));
 		model.material_idx = rand() % texture_paths.size();
+		model.normal_mat = glm::mat3(glm::transpose(glm::inverse(model.model_transform)));
 
 		scene->add_model(i & 1, model);
 	}
