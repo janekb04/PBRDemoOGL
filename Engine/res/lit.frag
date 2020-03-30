@@ -41,5 +41,5 @@ void main()
 	//vec3 lighting = a_ambient + calculate_point_lighting(a_light_pos, a_light_color, normal);
 	vec3 lighting = a_ambient + calculate_directional_lighting(a_light_dir, a_light_color, normal);
 
-    f_color = vec4(albedo * lighting, 1);
+    f_color = vec4(albedo * lighting, alpha);
 }

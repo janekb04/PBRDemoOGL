@@ -27,7 +27,7 @@ int main()
 	};
     
 	//DemoScene scene;
-	auto scene = create_test_scene(8);
+	auto scene = create_test_scene(1'000'000);
 
 	PerspectiveCamera camera;
 	Uniform a_camera = lit.get_uniform_location("a_camera");
@@ -60,11 +60,16 @@ int main()
 			lit.uniform(a_view, false, view);
 
 			
-			glm::vec3 dir = glm::normalize(view * glm::vec4(-1, 0, 0, 0));
+			glm::vec3 dir = glm::normalize(view * glm::vec4(
+				sin(WindowManager::get_time()),
+				0,
+				cos(WindowManager::get_time()),
+				0
+			));
+			
 			lit.uniform(a_light_dir, dir);
 			lit.uniform(a_light_color, glm::vec3(1, 1, 1));
 			lit.uniform(a_ambient, glm::vec3(0.2f, 0.3f, 0.3f));
-
 
 
 			scene->setup_state();

@@ -146,7 +146,7 @@ public:
 			VertexAttribute column{ NORMAL_MAT_IDX.index() + i };
 			VAO.enable_attrib(column);
 			VAO.attrib_binding(column, INSTANCED_VBO_IDX);
-			VAO.attrib_format(column, 4, GL_FLOAT, GL_FALSE, offsetof(Model, normal_mat) + sizeof(glm::mat4::col_type) * i);
+			VAO.attrib_format(column, 3, GL_FLOAT, GL_FALSE, offsetof(Model, normal_mat) + sizeof(glm::mat3::col_type) * i);
 		}
 
 		VAO.element_buffer(EBO);
