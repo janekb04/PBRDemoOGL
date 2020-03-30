@@ -74,6 +74,8 @@ public:
 		};
 		glTextureSubImage3D(handle, 0, 0, 0, 0, width, height, count, formats[channels - 1], GL_UNSIGNED_BYTE, data.data());
 
+		glGenerateTextureMipmap(handle);
+
 		return Texture2dArray(handle);
 	}
 

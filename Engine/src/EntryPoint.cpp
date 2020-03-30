@@ -20,6 +20,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+	glEnable(GL_FRAMEBUFFER_SRGB);
 
     ShaderProgram lit{
 		Shader{read_file("res/lit.vert").c_str(), GL_VERTEX_SHADER},
@@ -27,14 +28,14 @@ int main()
 	};
     
 	//DemoScene scene;
-	auto scene = create_test_scene(1'000'000);
+	auto scene = create_test_scene(1000);
 
 	PerspectiveCamera camera;
 	Uniform a_camera = lit.get_uniform_location("a_camera");
 	Uniform a_view = lit.get_uniform_location("a_view");
 	OrbitCamera controller(camera.transform);
 
-	Uniform a_light_dir = lit.get_uniform_location("a_light_dir");
+	Uniform a_light_pos = lit.get_uniform_location("a_light_pos");
 	Uniform a_light_color = lit.get_uniform_location("a_light_color");
 	Uniform a_ambient = lit.get_uniform_location("a_ambient");
 
@@ -60,17 +61,13 @@ int main()
 			lit.uniform(a_view, false, view);
 
 			
-			glm::vec3 dir = glm::normalize(view * glm::vec4(
-				sin(WindowManager::get_time()),
-				0,
-				cos(WindowManager::get_time()),
-				0
-			));
+			glm::vec3 pos = glm::vec3(
+				20, 20, 20
+			);
 			
-			lit.uniform(a_light_dir, dir);
-			lit.uniform(a_light_color, glm::vec3(1, 1, 1));
+			lit.uniform(a_light_pos, view * glm::vec4(pos, 1));
+			lit.uniform(a_light_color, 15.0f * glm::vec3(1, 1, 1));
 			lit.uniform(a_ambient, glm::vec3(0.2f, 0.3f, 0.3f));
-
 
 			scene->setup_state();
 			scene->draw();

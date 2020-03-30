@@ -20,6 +20,7 @@ out vec3 v_normal;
 out vec3 v_tangent;
 out vec2 v_uv;
 out flat int v_base_idx;
+out flat int v_gloss_idx;
 
 uniform mat4 a_camera;
 uniform mat4 a_view;
@@ -27,6 +28,7 @@ uniform mat4 a_view;
 struct material
 {
 	int base_idx;
+	int gloss_idx;
 };
 
 layout (std430, binding = 0) buffer materials
@@ -38,6 +40,7 @@ void main()
 {
 	material mat = a_materials[a_material_idx];
 	v_base_idx = mat.base_idx;
+	v_gloss_idx = mat.gloss_idx;
 	
 	vec4 pos_in_world_space = a_model * vec4(a_pos, 1);
 	mat4 model_to_view_space = a_view * a_model;
