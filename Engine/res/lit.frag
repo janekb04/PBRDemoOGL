@@ -1,11 +1,11 @@
 #version 460 core
 
 in vec3 v_pos;
-in vec3 v_normal;
-in vec3 v_tangent;
 in vec2 v_uv;
 in flat int v_base_idx;
 in flat int v_gloss_idx;
+in flat int v_normal_idx;
+in mat3 v_TBN;
 
 out vec4 f_color;
 
@@ -38,6 +38,13 @@ vec3 calculate_point_lighting(vec3 light_pos, vec3 light_color, vec3 normal, vec
 	return lighting / attentuation;
 }
 
+vec3 sample_normal_map()
+{
+	vec3 normal = texture(a_textures, vec3(v_uv, v_normal_idx)).xyz;
+	normal = normal * 2 - 1;
+	return normalize(v_TBN * normal);
+}
+
 void main()
 {	
 	vec4 base_color = texture(a_textures, vec3(v_uv, v_base_idx));
@@ -46,10 +53,9 @@ void main()
 	vec3 albedo = base_color.rgb;
 	float alpha = base_color.a;
 
-	vec3 normal = normalize(v_normal);
+	vec3 normal = sample_normal_map();
 
-	vec3 lighting = a_ambient + calculate_point_lighting(a_light_pos, a_light_color, normal, v_pos, 16.0);
-	//vec3 lighting = a_ambient + calculate_directional_lighting(a_light_dir, a_light_color, normal);
+	vec3 lighting = a_ambient + calculate_point_lighting(a_light_pos, a_light_color, normal, v_pos, gloss);
 
     f_color = vec4(albedo * lighting, alpha);
 }

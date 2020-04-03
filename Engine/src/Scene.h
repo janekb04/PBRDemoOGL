@@ -11,6 +11,7 @@
 #include "UnorderedArraySet.h"
 #include "MappedGPUArray.h"
 #include "Utility.h"
+#include "Image2dArray.h"
 
 class Scene
 {
@@ -78,13 +79,13 @@ private:
 		m_commands.sub_data(sizeof(glDrawElementsIndirectCommand) * batch_id, sizeof(glDrawElementsIndirectCommand), &cmd);
 	}
 public:
-	Scene(const std::vector<const char*>& texture_paths, const std::vector<Mesh>& meshes, size_t max_models, size_t max_materials) :
-		textures(Texture2dArray::from_files(texture_paths.data(), texture_paths.size())),
-		texture_num(texture_paths.size())
+	Scene(const Image2dArray& images, const std::vector<Mesh>& meshes, size_t max_models, size_t max_materials) :
+		textures(Texture2dArray::from_image_array(images, 4)),
+		texture_num(images.depth())
 	{
 		{
 			MeshBuilder<Vertex, unsigned> builder;
-		
+
 			for (const auto& mesh : meshes)
 				builder.add_mesh(mesh.vertices, mesh.indices);
 

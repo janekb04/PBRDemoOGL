@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vendor.h"
+#include "Image2d.h"
 
 class Texture2d
 {
@@ -19,24 +20,13 @@ private:
 	}
 public:
 	Texture2d(const Texture2d&) = delete;
-	static Texture2d from_file(const std::string& path)
+
+	static Texture2d from_image(const Image2d& image)
 	{
-		int width, height, channels;
-		unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-
-		if (!data)
-			throw std::runtime_error("failed to load texture");
-
 		GLuint handle = create_texture();
 
-		GLenum internal_formats[]
-		{
-			GL_R8,
-			GL_RG8,
-			GL_RGB8,
-			GL_RGBA8,
-		};
-		glTextureStorage2D(handle, 1, internal_formats[channels - 1], width, height);
+		glTextureStorage2D(handle, 1, image.internal_format(), image.width(), image.height());
+
 		GLenum formats[]
 		{
 			GL_RED,
@@ -44,11 +34,14 @@ public:
 			GL_RGB,
 			GL_RGBA,
 		};
-		glTextureSubImage2D(handle, 0, 0, 0, width, height, formats[channels - 1], GL_UNSIGNED_BYTE, data);
-
-		stbi_image_free(data);
+		glTextureSubImage2D(handle, 0, 0, 0, image.width(), image.height(), formats[image.channels() - 1], GL_UNSIGNED_BYTE, image.data());
 
 		return Texture2d(handle);
+	}
+
+	void bind() const
+	{
+		glBindTexture(GL_TEXTURE_2D, handle);
 	}
 
 	~Texture2d()
