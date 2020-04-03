@@ -24,7 +24,7 @@ public:
 	static Texture2dArray from_image_array(const Image2dArray& images, int mipmap_count = 1)
 	{
 		GLuint handle = create_texture();
-
+		
 		glTextureStorage3D(handle, mipmap_count, images.internal_format(), images.width(), images.height(), images.depth());
 		GLenum formats[]
 		{

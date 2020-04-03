@@ -8,12 +8,12 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 	int mat_count = 0;
 	{
 		std::vector<Image2d> images;
-		images.push_back(Image2d::from_file("res/concrete_albedo.jpg"));
-		images.push_back(Image2d::from_file("res/concrete_gloss.jpg"));
-		images.push_back(Image2d::from_file("res/concrete_normal.jpg"));
-		images.push_back(Image2d::from_file("res/metal_albedo.jpg"));
-		images.push_back(Image2d::from_file("res/metal_gloss.jpg"));
-		images.push_back(Image2d::from_file("res/metal_normal.jpg"));
+		images.push_back(Image2d::from_file("res/concrete_albedo.jpg", true));
+		images.push_back(Image2d::from_file("res/concrete_gloss.jpg", true));
+		images.push_back(Image2d::from_file("res/concrete_normal.jpg", false));
+		images.push_back(Image2d::from_file("res/metal_albedo.jpg", true));
+		images.push_back(Image2d::from_file("res/metal_gloss.jpg", true));
+		images.push_back(Image2d::from_file("res/metal_normal.jpg", false));
 
 		mat_count = images.size() / 3;
 

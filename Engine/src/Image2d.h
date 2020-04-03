@@ -32,13 +32,22 @@ public:
 		other.m_channels = 0;
 	}
 
-	static Image2d from_file(const std::string& path)
+	static Image2d from_file(const std::string& path, bool is_srgb)
 	{
 		int width, height, channels;
 		unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 
 		if (!data)
 			throw std::runtime_error("failed to load image");
+
+		if (is_srgb)
+		{
+			//TODO: don't do this. it looses a lot of precision. just use GL_SRGB internal_format
+			for (int i = 0; i < width * height * channels; ++i)
+			{
+				data[i] = (255.0 * pow(data[i] / 255.0 , 2.2)) + 0.5;
+			}
+		}
 
 		GLenum internal_formats[]
 		{

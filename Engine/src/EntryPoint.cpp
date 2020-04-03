@@ -66,7 +66,7 @@ int main()
 			);
 			
 			lit.uniform(a_light_pos, view * glm::vec4(pos, 1));
-			lit.uniform(a_light_color, 25.0f * glm::vec3(1, 1, 1));
+			lit.uniform(a_light_color, 50.0f * glm::vec3(1, 1, 1));
 			lit.uniform(a_ambient, glm::vec3(0.2f, 0.3f, 0.3f));
 
 			scene->setup_state();
