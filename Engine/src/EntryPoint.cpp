@@ -40,45 +40,52 @@ int main()
 	Uniform a_ambient = lit.get_uniform_location("a_ambient");
 
 	double old_time = WindowManager::get_time();
-	double delta_time = 0;
+	double delta_time = 1;
 	unsigned long long frame = 0;
     while (!wnd.should_close())
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		if (frame % 60 == 0)
+		try 
 		{
-			std::cout << 1/delta_time << '\n';
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+			if (frame % 60 == 0)
+			{
+				std::cout << 1/delta_time << '\n';
+			}
+	
+			controller.update(wnd, delta_time);
+	
+			//draw
+			{
+				lit.use();
+				auto view = camera.get_view_matrix();
+				lit.uniform(a_camera, false, camera.get_projection_matrix(wnd.viewport()) * view);
+				lit.uniform(a_view, false, view);
+	
+				
+				glm::vec3 pos = glm::vec3(
+					20, 40, 20
+				);
+				
+				lit.uniform(a_light_pos, view * glm::vec4(pos, 1));
+				lit.uniform(a_light_color, 50.0f * glm::vec3(1, 1, 1));
+				lit.uniform(a_ambient, glm::vec3(0.2f, 0.3f, 0.3f));
+	
+				scene->setup_state();
+				scene->draw();
+			}
+	
+			wnd.end_frame();
+	        WindowManager::poll_events();
+	
+			double new_time = WindowManager::get_time();
+			delta_time = new_time - old_time;
+			old_time = new_time;
+			++frame;
 		}
-
-		controller.update(wnd, delta_time);
-
-		//draw
+		catch (std::exception& e)
 		{
-			lit.use();
-			auto view = camera.get_view_matrix();
-			lit.uniform(a_camera, false, camera.get_projection_matrix(wnd.viewport()) * view);
-			lit.uniform(a_view, false, view);
-
-			
-			glm::vec3 pos = glm::vec3(
-				20, 40, 20
-			);
-			
-			lit.uniform(a_light_pos, view * glm::vec4(pos, 1));
-			lit.uniform(a_light_color, 50.0f * glm::vec3(1, 1, 1));
-			lit.uniform(a_ambient, glm::vec3(0.2f, 0.3f, 0.3f));
-
-			scene->setup_state();
-			scene->draw();
+			std::cerr << e.what() << '\n';
 		}
-
-		wnd.end_frame();
-        WindowManager::poll_events();
-
-		double new_time = WindowManager::get_time();
-		delta_time = new_time - old_time;
-		old_time = new_time;
-		++frame;
 	}
 }

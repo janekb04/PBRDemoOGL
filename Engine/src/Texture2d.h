@@ -2,6 +2,7 @@
 
 #include "Vendor.h"
 #include "Image2d.h"
+#include "TextureHandle.h"
 
 class Texture2d
 {
@@ -20,12 +21,16 @@ private:
 	}
 public:
 	Texture2d(const Texture2d&) = delete;
-
-	static Texture2d from_image(const Image2d& image)
+	Texture2d(Texture2d&& other) :
+		handle(other.handle)
 	{
-		GLuint handle = create_texture();
+		other.handle = 0;
+	}
 
-		glTextureStorage2D(handle, 1, image.internal_format(), image.width(), image.height());
+	Texture2d(const Image2d& image, int mip_levels = 1) :
+		handle(create_texture())
+	{
+		glTextureStorage2D(handle, mip_levels, image.internal_format(), image.width(), image.height());
 
 		GLenum formats[]
 		{
@@ -36,7 +41,13 @@ public:
 		};
 		glTextureSubImage2D(handle, 0, 0, 0, image.width(), image.height(), formats[image.channels() - 1], GL_UNSIGNED_BYTE, image.data());
 
-		return Texture2d(handle);
+		if (mip_levels > 1)
+			glGenerateTextureMipmap(handle);
+	}
+
+	TextureHandle get_texture_handle() const
+	{
+		return TextureHandle(glGetTextureHandleARB(handle));
 	}
 
 	void bind() const
@@ -46,6 +57,7 @@ public:
 
 	~Texture2d()
 	{
-		glDeleteTextures(1, &handle);
+		if(handle)
+			glDeleteTextures(1, &handle);
 	}
 };

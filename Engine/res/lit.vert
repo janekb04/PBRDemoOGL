@@ -1,4 +1,5 @@
 #version 460 core
+#extension GL_ARB_bindless_texture : require
 
 // -----------  Per vertex  -----------
 layout (location = 0) in vec3 a_pos;
@@ -15,34 +16,33 @@ layout (location = 9) in mat3 a_normal_mat;
 //      location = 10
 //      location = 11
 
+struct Material
+{
+	uvec2 base_idx;
+	uvec2 gloss_idx;
+	uvec2 normal_idx;
+};
+
 out vec3 v_pos;
 out vec2 v_uv;
-out flat int v_base_idx;
-out flat int v_gloss_idx;
-out flat int v_normal_idx;
+out flat Material v_material;
 out mat3 v_TBN;
 
 uniform mat4 a_camera;
 uniform mat4 a_view;
 
-struct material
-{
-	int base_idx;
-	int gloss_idx;
-	int normal_idx;
-};
-
 layout (std430, binding = 0) buffer materials
 {
-	material a_materials[];
+	uvec2 a_materials[];
 };
 
 void send_material_properties()
 {
-	material mat = a_materials[a_material_idx];
-	v_base_idx = mat.base_idx;
-	v_gloss_idx = mat.gloss_idx;
-	v_normal_idx = mat.normal_idx;
+	int i = a_material_idx * 3;
+
+	v_material.base_idx = a_materials[i];
+	v_material.gloss_idx = a_materials[i + 1];
+	v_material.normal_idx = a_materials[i + 2];
 }
 
 void send_vertex_properties()

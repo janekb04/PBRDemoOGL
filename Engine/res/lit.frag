@@ -1,10 +1,16 @@
 #version 460 core
+#extension GL_ARB_bindless_texture : require
+
+struct Material
+{
+	uvec2 base_idx;
+	uvec2 gloss_idx;
+	uvec2 normal_idx;
+};
 
 in vec3 v_pos;
 in vec2 v_uv;
-in flat int v_base_idx;
-in flat int v_gloss_idx;
-in flat int v_normal_idx;
+in flat Material v_material;
 in mat3 v_TBN;
 
 out vec4 f_color;
@@ -40,15 +46,15 @@ vec3 calculate_point_lighting(vec3 light_pos, vec3 light_color, vec3 normal, vec
 
 vec3 sample_normal_map()
 {
-	vec3 normal = texture(a_textures, vec3(v_uv, v_normal_idx)).xyz;
+	vec3 normal = texture(sampler2D(v_material.normal_idx), v_uv).xyz;
 	normal = normal * 2 - 1;
 	return normalize(v_TBN * normal);
 }
 
 void main()
 {	
-	vec4 base_color = texture(a_textures, vec3(v_uv, v_base_idx));
-	float gloss = texture(a_textures, vec3(v_uv, v_gloss_idx)).r;
+	vec4 base_color = texture(sampler2D(v_material.base_idx), v_uv);
+	float gloss = texture(sampler2D(v_material.gloss_idx), v_uv).r;
 
 	vec3 albedo = base_color.rgb;
 	float alpha = base_color.a;

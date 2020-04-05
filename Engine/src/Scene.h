@@ -5,13 +5,12 @@
 #include "VertexArray.h"
 #include "MultiDrawBuilder.h"
 #include "Vertex.h"
-#include "Texture2dArray.h"
 #include "Mesh.h"
 #include "Material.h"
 #include "UnorderedArraySet.h"
 #include "MappedGPUArray.h"
 #include "Utility.h"
-#include "Image2dArray.h"
+#include "Texture2d.h"
 
 class Scene
 {
@@ -36,15 +35,11 @@ private:
 	unsigned m_material_count;
 	unsigned m_instances = 0;
 	unsigned m_model_count = 0;
-
-	Texture2dArray textures;
-	size_t texture_num;
-
+	std::vector<Texture2d> textures;
 public:
 	using MaterialHandle = unsigned;
 	using ModelHandle = unsigned;
 	using MeshHandle = unsigned;
-	using TextureHandle = unsigned;
 private:
 private:
 	BatchHandle add_batch(MeshHandle mesh_id, unsigned instances)
@@ -79,9 +74,7 @@ private:
 		m_commands.sub_data(sizeof(glDrawElementsIndirectCommand) * batch_id, sizeof(glDrawElementsIndirectCommand), &cmd);
 	}
 public:
-	Scene(const Image2dArray& images, const std::vector<Mesh>& meshes, size_t max_models, size_t max_materials) :
-		textures(Texture2dArray::from_image_array(images, 4)),
-		texture_num(images.depth())
+	Scene(const std::vector<Mesh>& meshes, size_t max_models, size_t max_materials)
 	{
 		{
 			MeshBuilder<Vertex, unsigned> builder;
@@ -153,6 +146,18 @@ public:
 		VAO.element_buffer(EBO);
 	}
 public:
+	const TextureHandle add_texture(const Image2d& data)
+	{
+		textures.emplace_back(data, 4);
+		TextureHandle handle = textures.back().get_texture_handle();
+		handle.make_resident();
+		return handle;
+	}
+	size_t texture_count() const
+	{
+		return textures.size();
+	}
+
 	MaterialHandle add_material(const Material& material)
 	{
 		materials.sub_data(sizeof(Material) * m_material_count, sizeof(Material), &material);
@@ -164,6 +169,14 @@ public:
 		Material material;
 		instance_data.get_sub_data(sizeof(Material) * material_id, sizeof(Material), &material);
 		return material;
+	}
+	void set_material_data(MaterialHandle material_id, const Material& data)
+	{
+		materials.sub_data(sizeof(Material) * material_id, sizeof(Material), &data);
+	}
+	size_t material_count() const
+	{
+		return m_material_count;
 	}
 
 	ModelHandle add_model(MeshHandle mesh_id, const Model& model)
@@ -186,11 +199,11 @@ public:
 	{
 		instance_data.sub_data(sizeof(Model) * model_id, sizeof(Model), &data);
 	}
-public:
-	size_t texture_count() const
+	size_t model_count() const
 	{
-		return texture_num;
+		return m_model_count;
 	}
+
 public:
 	void draw() const
 	{
@@ -203,7 +216,5 @@ public:
 		m_commands.bind(GL_DRAW_INDIRECT_BUFFER);
 		const unsigned MATERIAL_SSBO_IDX = 0;
 		materials.bind_base(GL_SHADER_STORAGE_BUFFER, MATERIAL_SSBO_IDX);
-		glActiveTexture(GL_TEXTURE0);
-		textures.bind();
 	}
 };

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "TextureHandle.h"
+
 struct Material
 {
-	int base_idx;
-	int gloss_idx;
-	int normal_idx;
+	TextureHandle base_idx;
+	TextureHandle gloss_idx;
+	TextureHandle normal_idx;
 };

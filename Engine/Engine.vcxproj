@@ -39,6 +39,7 @@
     <ClInclude Include="src\Index.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Texture2dArray.h" />
+    <ClInclude Include="src\TextureHandle.h" />
     <ClInclude Include="src\UnorderedArraySet.h" />
     <ClInclude Include="src\Vertex.h" />
     <ClInclude Include="src\Transform.h" />

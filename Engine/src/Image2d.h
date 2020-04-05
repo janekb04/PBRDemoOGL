@@ -40,24 +40,32 @@ public:
 		if (!data)
 			throw std::runtime_error("failed to load image");
 
+		GLenum internal_format;
 		if (is_srgb)
 		{
-			//TODO: don't do this. it looses a lot of precision. just use GL_SRGB internal_format
-			for (int i = 0; i < width * height * channels; ++i)
+			GLenum internal_formats[]
 			{
-				data[i] = (255.0 * pow(data[i] / 255.0 , 2.2)) + 0.5;
-			}
+				GL_SR8_EXT,
+				GL_SRG8_EXT,
+				GL_SRGB8,
+				GL_SRGB_ALPHA,
+			};
+			internal_format = internal_formats[channels - 1];
+		}
+		else
+		{
+			GLenum internal_formats[]
+			{
+				GL_R8,
+				GL_RG8,
+				GL_RGB8,
+				GL_RGBA8,
+			};
+			internal_format = internal_formats[channels - 1];
 		}
 
-		GLenum internal_formats[]
-		{
-			GL_R8,
-			GL_RG8,
-			GL_RGB8,
-			GL_RGBA8,
-		};
 
-		return Image2d(data, internal_formats[channels - 1], width, height, channels);
+		return Image2d(data, internal_format, width, height, channels);
 	}
 
 	unsigned char* data() const noexcept
