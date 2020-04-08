@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Buffer.h" />
+    <ClInclude Include="src\BufferArray.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Defines.h" />
     <ClInclude Include="src\GPUArray.h" />

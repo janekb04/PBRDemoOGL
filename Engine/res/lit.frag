@@ -36,9 +36,20 @@ out vec4 f_color;
 
 uniform sampler2DArray a_textures;
 
-uniform vec3 a_light_pos;
-uniform vec3 a_light_color;
 uniform vec3 a_ambient;
+
+layout (std430, binding = 1) buffer point_lights
+{
+	PointLight a_point_lights[];
+};
+layout (std430, binding = 2) buffer directional_lights
+{
+	DirectionalLight a_directional_lights[];
+};
+layout (std430, binding = 3) buffer spotlights
+{
+	Spotlight a_spotlights[];
+};
 
 float f_lit(vec3 light_dir, vec3 normal, vec3 view_dir, float gloss)
 {
@@ -104,7 +115,21 @@ void main()
 
 	vec3 normal = sample_normal_map();
 
-	vec3 lighting = a_ambient + calculate_point_lighting(PointLight(a_light_pos, a_light_color), normal, v_pos, normalize(-v_pos), gloss);
+	vec3 view_dir = normalize(-v_pos);
+
+	vec3 lighting = a_ambient;
+	for (int i = 0; i < a_point_lights.length(); ++i)
+	{
+		lighting += calculate_point_lighting(a_point_lights[i], normal, v_pos, view_dir, gloss);
+	}
+	for (int i = 0; i < a_directional_lights.length(); ++i)
+	{
+		lighting += calculate_directional_lighting(a_directional_lights[i], normal, view_dir, gloss);
+	}
+	for (int i = 0; i < a_spotlights.length(); ++i)
+	{
+		lighting += calculate_spotlight_lighting(a_spotlights[i], normal, v_pos, view_dir, gloss);
+	}
 
     f_color = vec4(albedo * lighting, alpha);
 }

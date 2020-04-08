@@ -31,12 +31,12 @@ public:
 		other.handle = 0;
 	}
 
-	void data(size_t size, const void* data, GLenum usage) const
+	void data(size_t size, const void* data, GLenum usage)
 	{
 		glNamedBufferData(handle, size, data, usage);
 	}
 
-	void storage(size_t size, const void* data, GLbitfield flags) const
+	void storage(size_t size, const void* data, GLbitfield flags)
 	{
 		glNamedBufferStorage(handle, size, data, flags);
 	}
@@ -46,12 +46,12 @@ public:
 		return glMapNamedBufferRange(handle, offset, length, access);
 	}
 
-	void sub_data(size_t offset, size_t size, const void* data)
+	void sub_data(size_t offset, size_t size, const void* data) const
 	{
 		glNamedBufferSubData(handle, offset, size, data);
 	}
 
-	void get_sub_data(size_t offset, size_t size, void* data)
+	void get_sub_data(size_t offset, size_t size, void* data) const
 	{
 		glGetNamedBufferSubData(handle, offset, size, data);
 	}
@@ -72,7 +72,7 @@ public:
 		glBindBuffer(target, handle);
 	}
 
-	void bind_base(GLenum target, unsigned index)
+	void bind_base(GLenum target, unsigned index) const
 	{
 		glBindBufferBase(target, index, handle);
 	}
