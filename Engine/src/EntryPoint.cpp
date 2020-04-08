@@ -35,6 +35,7 @@ int main()
 	Uniform a_view = lit.get_uniform_location("a_view");
 	OrbitCamera controller(camera.transform);
 
+	//TODO: multiple lights
 	Uniform a_light_pos = lit.get_uniform_location("a_light_pos");
 	Uniform a_light_color = lit.get_uniform_location("a_light_color");
 	Uniform a_ambient = lit.get_uniform_location("a_ambient");
