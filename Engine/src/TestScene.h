@@ -34,10 +34,15 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 		scene->add_texture(Image2d::from_file("res/metal_normal.jpg", false)),
 	});
 
-	//scene->directional_lights.add({
-	//	{0, -1, 0},
-	//	{2, 2, 2}
-	//});
+	scene->point_lights.add({
+		{10, 10, 10, 0},
+		{0, 20, 0, 0}
+	});
+
+	scene->directional_lights.add({
+		glm::normalize(glm::vec4{.3, .9, 0.1, 0}),
+		{10, 10, 10, 0}
+	});
 
 	unsigned side_length = ceil(cbrt(obj_count));
 	unsigned face_size = side_length * side_length;

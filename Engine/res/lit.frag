@@ -10,19 +10,19 @@ struct Material
 
 struct PointLight
 {
-	vec3 pos;
-	vec3 color;
+	vec4 pos;
+	vec4 color;
 };
 struct DirectionalLight
 {
-	vec3 direction;
-	vec3 color;
+	vec4 direction;
+	vec4 color;
 };
 struct Spotlight
 {
-	vec3 pos;
-	vec3 direction;
-	vec3 color;
+	vec4 pos;
+	vec4 direction;
+	vec4 color;
 	float cos_difference;
 	float cos_outer_angle;
 };
@@ -35,18 +35,19 @@ in mat3 v_TBN;
 out vec4 f_color;
 
 uniform sampler2DArray a_textures;
+uniform vec3 a_camera_pos;
 
 uniform vec3 a_ambient;
 
-layout (std430, binding = 1) buffer point_lights
+layout (std430, binding = 1)  restrict readonly buffer point_lights
 {
 	PointLight a_point_lights[];
 };
-layout (std430, binding = 2) buffer directional_lights
+layout (std430, binding = 2)  restrict readonly buffer directional_lights
 {
 	DirectionalLight a_directional_lights[];
 };
-layout (std430, binding = 3) buffer spotlights
+layout (std430, binding = 3)  restrict readonly buffer spotlights
 {
 	Spotlight a_spotlights[];
 };
@@ -76,26 +77,26 @@ float f_dir(float t)
 
 vec3 calculate_directional_lighting(DirectionalLight light, vec3 normal, vec3 view_dir, float gloss)
 {	
-	return light.color * f_lit(light.direction, normal, view_dir, gloss);
+	return light.color.rgb * f_lit(light.direction.xyz, normal, view_dir, gloss);
 }
 
 vec3 calculate_point_lighting(PointLight light, vec3 normal, vec3 pos, vec3 view_dir, float gloss)
 {
-	vec3 r = light.pos - pos;
+	vec3 r = light.pos.xyz - pos;
 	vec3 light_dir = normalize(r);
 
-	return light.color * f_attentuation(r) * f_lit(light_dir, normal, view_dir, gloss);
+	return light.color.rgb * f_attentuation(r) * f_lit(light_dir, normal, view_dir, gloss);
 }
 
 vec3 calculate_spotlight_lighting(Spotlight light, vec3 normal, vec3 pos, vec3 view_dir, float gloss)
 {
-	vec3 r = light.pos - pos;
+	vec3 r = light.pos.xyz - pos;
 	vec3 light_dir = normalize(r);
 
-	float cos_angle = dot(light_dir, light.direction);
+	float cos_angle = dot(light_dir, light.direction.xyz);
 	float t = (cos_angle - light.cos_outer_angle) / light.cos_difference;
 
-	return light.color * f_dir(t) * f_attentuation(r) * f_lit(light_dir, normal, view_dir, gloss);
+	return light.color.rgb * f_dir(t) * f_attentuation(r) * f_lit(light_dir, normal, view_dir, gloss);
 }
 
 vec3 sample_normal_map()
@@ -115,7 +116,7 @@ void main()
 
 	vec3 normal = sample_normal_map();
 
-	vec3 view_dir = normalize(-v_pos);
+	vec3 view_dir = normalize(a_camera_pos - v_pos);
 
 	vec3 lighting = a_ambient;
 	for (int i = 0; i < a_point_lights.length(); ++i)

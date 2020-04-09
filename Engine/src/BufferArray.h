@@ -8,7 +8,7 @@ class BufferArray
 {
 private:
 	Buffer m_buffer;
-	size_t m_size, m_capacity;
+	unsigned m_size, m_capacity;
 public:
 	using handle = size_t;
 public:
@@ -19,12 +19,12 @@ public:
 		m_buffer.storage(sizeof(T) * max_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
 	}
 
-	size_t size() const noexcept
+	unsigned size() const noexcept
 	{
 		return m_size;
 	}
 
-	size_t capacity() const noexcept
+	unsigned capacity() const noexcept
 	{
 		return m_capacity;
 	}

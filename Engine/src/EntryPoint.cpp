@@ -16,7 +16,10 @@ int main()
 	OpenGLWindow wnd;
 
 	WindowManager::set_swap_interval(1);
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	stbi_set_flip_vertically_on_load(true);
+
+	const glm::vec3 ambient{ 0.2f, 0.3f, 0.3f };
+	glClearColor(ambient.x, ambient.y, ambient.z, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -32,13 +35,10 @@ int main()
 
 	PerspectiveCamera camera;
 	Uniform a_camera = lit.get_uniform_location("a_camera");
-	Uniform a_view = lit.get_uniform_location("a_view");
+	Uniform a_camera_pos = lit.get_uniform_location("a_camera_pos");
 	OrbitCamera controller(camera.transform);
 
-	//TODO: multiple lights
-	Uniform a_light_pos = lit.get_uniform_location("a_light_pos");
-	Uniform a_light_color = lit.get_uniform_location("a_light_color");
-	Uniform a_ambient = lit.get_uniform_location("a_ambient");
+	lit.uniform(lit.get_uniform_location("a_ambient"), ambient);
 
 	double old_time = WindowManager::get_time();
 	double delta_time = 1;
@@ -61,17 +61,8 @@ int main()
 				lit.use();
 				auto view = camera.get_view_matrix();
 				lit.uniform(a_camera, false, camera.get_projection_matrix(wnd.viewport()) * view);
-				lit.uniform(a_view, false, view);
-	
-				
-				glm::vec3 pos = glm::vec3(
-					20, 40, 20
-				);
-				
-				lit.uniform(a_light_pos, view * glm::vec4(pos, 1));
-				lit.uniform(a_light_color, 50.0f * glm::vec3(1, 1, 1));
-				lit.uniform(a_ambient, glm::vec3(0.2f, 0.3f, 0.3f));
-	
+				lit.uniform(a_camera_pos, camera.transform.get_position());
+
 				scene->setup_state();
 				scene->draw();
 			}

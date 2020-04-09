@@ -25,42 +25,42 @@ public:
 	};
 	struct PointLight
 	{
-		glm::vec3 pos;
-		glm::vec3 color;
+		glm::vec4 pos;
+		glm::vec4 color;
 	};
 	struct DirectionalLight
 	{
-		glm::vec3 direction;
-		glm::vec3 color;
+		glm::vec4 direction;
+		glm::vec4 color;
 	};
 	struct Spotlight
 	{
-		glm::vec3 pos;
-		glm::vec3 direction;
-		glm::vec3 color;
+		glm::vec4 pos;
+		glm::vec4 direction;
+		glm::vec4 color;
 		float cos_difference;
 		float cos_outer_angle;
 	};
 	//Per-vertex attributes binding indices
-	const VertexAttribute POS_IDX{ 0 };
-	const VertexAttribute NORMAL_IDX{ 1 };
-	const VertexAttribute UV_IDX{ 2 };
-	const VertexAttribute TANGENT_IDX{ 3 };
+	static inline const VertexAttribute POS_IDX{ 0 };
+	static inline const VertexAttribute NORMAL_IDX{ 1 };
+	static inline const VertexAttribute UV_IDX{ 2 };
+	static inline const VertexAttribute TANGENT_IDX{ 3 };
 
 	//Per-instance attributes binding indices
-	const VertexAttribute MODEL_IDX{ 4 };
-	const VertexAttribute MATERIAL_IDX_IDX{ 8 };
-	const VertexAttribute NORMAL_MAT_IDX{ 9 };
+	static inline const VertexAttribute MODEL_IDX{ 4 };
+	static inline const VertexAttribute MATERIAL_IDX_IDX{ 8 };
+	static inline const VertexAttribute NORMAL_MAT_IDX{ 9 };
 
 	//SSBO binding indices
-	const unsigned MATERIAL_SSBO_IDX = 0;
-	const unsigned POINT_LIGHT_SSBO_IDX = 1;
-	const unsigned DIRECTIONAL_LIGHT_SSBO_IDX = 2;
-	const unsigned SPOTLIGHT_SSBO_IDX = 3;
+	static inline const unsigned MATERIAL_SSBO_IDX = 0;
+	static inline const unsigned POINT_LIGHT_SSBO_IDX = 1;
+	static inline const unsigned DIRECTIONAL_LIGHT_SSBO_IDX = 2;
+	static inline const unsigned SPOTLIGHT_SSBO_IDX = 3;
 private:
 	//VBO binding points
-	const unsigned int VBO_IDX = 0;
-	const unsigned int INSTANCED_VBO_IDX = 1;
+	static inline const unsigned int VBO_IDX = 0;
+	static inline const unsigned int INSTANCED_VBO_IDX = 1;
 private:
 	using MeshData = MeshBuilder<Vertex, GLuint>::MeshData;
 private:

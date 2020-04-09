@@ -29,9 +29,8 @@ out flat Material v_material;
 out mat3 v_TBN;
 
 uniform mat4 a_camera;
-uniform mat4 a_view;
 
-layout (std430, binding = 0) buffer materials
+layout (std430, binding = 0) restrict readonly buffer materials
 {
 	uvec2 a_materials[];
 };
@@ -48,9 +47,8 @@ void send_material_properties()
 void send_vertex_properties()
 {
 	vec4 pos_in_world_space = a_model * vec4(a_pos, 1);
-	mat4 model_view = a_view * a_model;
 
-	v_pos = vec3(model_view * pos_in_world_space);
+	v_pos = vec3(a_model * pos_in_world_space);
 	v_uv = a_uv;
 
 	gl_Position = a_camera * pos_in_world_space;
@@ -58,10 +56,8 @@ void send_vertex_properties()
 
 void send_tangent_space_matrix()
 {
-	mat3 normal_view = mat3(a_view) * a_normal_mat;
-
-	vec3 normal = normalize(normal_view * a_normal);
-	vec3 tangent = normalize(normal_view * a_tangent);
+	vec3 normal = normalize(a_normal_mat * a_normal);
+	vec3 tangent = normalize(a_normal_mat * a_tangent);
 	vec3 bitangent = cross(normal, tangent);
 
 	v_TBN = mat3(tangent, bitangent, normal);
