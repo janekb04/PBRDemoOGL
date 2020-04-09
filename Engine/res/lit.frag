@@ -106,6 +106,47 @@ vec3 sample_normal_map()
 	return normalize(v_TBN * normal);
 }
 
+vec3 RRTAndODTFit(vec3 v)
+{
+    vec3 a = v * (v + 0.0245786f) - 0.000090537f;
+    vec3 b = v * (0.983729f * v + 0.4329510f) + 0.238081f;
+    return a / b;
+}
+
+vec3 ACESFitted(vec3 color)
+{
+	//from https://github.com/TheRealMJP/BakingLab/blob/master/BakingLab/ACES.hlsl
+    const mat3 ACESInputMat =
+	{
+		{0.59719, 0.35458, 0.04823},
+		{0.07600, 0.90834, 0.01566},
+		{0.02840, 0.13383, 0.83777}
+	};
+	const mat3 ACESOutputMat =
+	{
+		{ 1.60475, -0.53108, -0.07367},
+		{-0.10208,  1.10813, -0.00605},
+		{-0.00327, -0.07276,  1.07602}
+	};
+
+	color = ACESInputMat * color;
+    color = RRTAndODTFit(color);
+    color = ACESOutputMat * color;
+    color = clamp(color, 0, 1);
+    return color;
+}
+
+vec3 reinhard(vec3 color)
+{
+	return color / (color + 1);
+}
+
+vec3 tonemapper(vec3 color)
+{
+	//return ACESFitted(color);
+	return reinhard(color);
+}
+
 void main()
 {	
 	vec4 base_color = texture(sampler2D(v_material.base_idx), v_uv);
@@ -132,5 +173,5 @@ void main()
 		lighting += calculate_spotlight_lighting(a_spotlights[i], normal, v_pos, view_dir, gloss);
 	}
 
-    f_color = vec4(albedo * lighting, alpha);
+    f_color = vec4(tonemapper(albedo * lighting), alpha);
 }
