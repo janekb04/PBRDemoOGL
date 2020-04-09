@@ -40,8 +40,8 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 	});
 
 	scene->directional_lights.add({
-		glm::normalize(glm::vec4{.3, .9, 0.1, 0}),
-		{10, 10, 10, 0}
+		glm::normalize(glm::vec4{0, .9, 0.1, 0}),
+		{5, 5, 5, 0}
 	});
 
 	unsigned side_length = ceil(cbrt(obj_count));
