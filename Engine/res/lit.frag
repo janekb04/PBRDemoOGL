@@ -141,6 +141,11 @@ vec3 RGBtoSRGB(vec3 color)
 	return pow(color, vec3(1/2.2));
 }
 
+vec3 SRGBtoRGB(vec3 color)
+{
+	return pow(color, vec3(2.2));
+}
+
 vec3 reinhard(vec3 color)
 {
 	vec3 tonemapped = color / (color + 1);

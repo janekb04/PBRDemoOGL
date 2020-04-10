@@ -19,7 +19,7 @@ int main()
 	stbi_set_flip_vertically_on_load(true);
 
 	const glm::vec3 ambient{ 0.2f, 0.3f, 0.3f };
-	glClearColor(ambient.x, ambient.y, ambient.z, 1.0f);
+	const float depth_clear{ 1.0f };
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -46,7 +46,8 @@ int main()
     {
 		try 
 		{
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClearBufferfv(GL_COLOR, 0, &(RGBtoSRGB(ambient)[0]));
+			glClearBufferfv(GL_DEPTH, 0, &depth_clear);
 	
 			if (frame % 60 == 0)
 			{

@@ -44,3 +44,15 @@ constexpr T* construct_at(T* p, Args&&... args) // replacement for C++20 std::co
 	return ::new (const_cast<void*>(static_cast<const volatile void*>(p)))
 		T(std::forward<Args>(args)...);
 }
+
+template <typename T>
+T RGBtoSRGB(const T& color)
+{
+	return pow(color, T{ 1 / 2.2 });
+}
+
+template <typename T>
+T SRGBtoRGB(const T& color)
+{
+	return pow(color, T{ 2.2 });
+}
