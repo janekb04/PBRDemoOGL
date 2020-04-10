@@ -129,22 +129,28 @@ vec3 ACESFitted(vec3 color)
 		{-0.00327, -0.07276,  1.07602}
 	};
 
-	color = ACESInputMat * color;
+	color = color * ACESInputMat;
     color = RRTAndODTFit(color);
-    color = ACESOutputMat * color;
+    color = color * ACESOutputMat;
     color = clamp(color, 0, 1);
     return color;
 }
 
+vec3 RGBtoSRGB(vec3 color)
+{
+	return pow(color, vec3(1/2.2));
+}
+
 vec3 reinhard(vec3 color)
 {
-	return color / (color + 1);
+	vec3 tonemapped = color / (color + 1);
+	return RGBtoSRGB(tonemapped);
 }
 
 vec3 tonemapper(vec3 color)
 {
-	//return ACESFitted(color);
-	return reinhard(color);
+	return ACESFitted(RGBtoSRGB(color));
+	//return reinhard(color);
 }
 
 void main()
