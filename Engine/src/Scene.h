@@ -38,7 +38,7 @@ public:
 		glm::vec4 pos;
 		glm::vec4 direction;
 		glm::vec4 color;
-		float cos_difference;
+		float cos_difference; // cos(inner_angle) - cos(outer_angle)
 		float cos_outer_angle;
 	};
 	//Per-vertex attributes binding indices
@@ -149,7 +149,7 @@ public:
 public:
 	const TextureHandle add_texture(const Image2d& data)
 	{
-		textures.emplace_back(data, 4);
+		textures.emplace_back(data, 1 + log2(std::min(data.width(), data.height())));
 		TextureHandle handle = textures.back().get_texture_handle();
 		handle.make_resident();
 		return handle;

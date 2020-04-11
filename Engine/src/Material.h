@@ -4,7 +4,9 @@
 
 struct Material
 {
-	TextureHandle base_idx;
-	TextureHandle gloss_idx;
+	TextureHandle albedo_idx;
 	TextureHandle normal_idx;
+	TextureHandle metalic_idx;
+	TextureHandle roughness_idx;
+	TextureHandle ao_idx;
 };

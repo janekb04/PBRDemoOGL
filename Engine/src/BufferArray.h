@@ -46,7 +46,7 @@ public:
 
 	void get_multiple(handle h_first, size_t count, T* dest) const
 	{
-		assert(h_first + count < m_size);
+		assert(h_first + count <= m_size);
 		
 		m_buffer.get_sub_data(sizeof(T) * h_first, sizeof(T) * count, dest);
 	}
@@ -65,7 +65,7 @@ public:
 
 	void set_multiple(handle h_first, size_t count, const T* data) const
 	{
-		assert(h_first + count < m_size);
+		assert(h_first + count <= m_size);
 
 		m_buffer.sub_data(sizeof(T) * h_first, sizeof(T) * count, data);
 	}

@@ -18,9 +18,11 @@ layout (location = 9) in mat3 a_normal_mat;
 
 struct Material
 {
-	uvec2 base_idx;
-	uvec2 gloss_idx;
+	uvec2 albedo_idx;
 	uvec2 normal_idx;
+	uvec2 metalic_idx;
+	uvec2 roughness_idx;
+	uvec2 ao_idx;
 };
 
 out vec3 v_pos;
@@ -37,21 +39,21 @@ layout (std430, binding = 0) restrict readonly buffer materials
 
 void send_material_properties()
 {
-	int i = a_material_idx * 3;
+	int i = a_material_idx * 5;
 
-	v_material.base_idx = a_materials[i];
-	v_material.gloss_idx = a_materials[i + 1];
-	v_material.normal_idx = a_materials[i + 2];
+	v_material.albedo_idx = a_materials[i];
+	v_material.normal_idx = a_materials[i + 1];
+	v_material.metalic_idx = a_materials[i + 2];
+	v_material.roughness_idx = a_materials[i + 3];
+	v_material.ao_idx = a_materials[i + 4];
 }
 
 void send_vertex_properties()
 {
-	vec4 pos_in_world_space = a_model * vec4(a_pos, 1);
-
-	v_pos = vec3(a_model * pos_in_world_space);
+	v_pos = vec3(a_model * vec4(a_pos, 1));
 	v_uv = a_uv;
 
-	gl_Position = a_camera * pos_in_world_space;
+	gl_Position = a_camera * vec4(v_pos, 1);
 }
 
 void send_tangent_space_matrix()

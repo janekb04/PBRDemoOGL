@@ -16,22 +16,18 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 	auto scene = std::make_unique<Scene>( 
 		meshes,
 		obj_count,
-		2,
+		1,
 		4,
 		1,
 		1
 	);
 
 	scene->materials.add({
-		scene->add_texture(Image2d::from_file("res/concrete_albedo.jpg", true)),
-		scene->add_texture(Image2d::from_file("res/concrete_gloss.jpg", true)),
-		scene->add_texture(Image2d::from_file("res/concrete_normal.jpg", false)),
-	});
-
-	scene->materials.add({
-		scene->add_texture(Image2d::from_file("res/metal_albedo.jpg", true)),
-		scene->add_texture(Image2d::from_file("res/metal_gloss.jpg", true)),
-		scene->add_texture(Image2d::from_file("res/metal_normal.jpg", false)),
+		scene->add_texture(Image2d::from_file("res/metal_rusty_albedo.jpg", true)),
+		scene->add_texture(Image2d::from_file("res/metal_rusty_normal.jpg", false)),
+		scene->add_texture(Image2d::from_file("res/black.png", true)),
+		scene->add_texture(Image2d::from_file("res/metal_rusty_roughness.jpg", true)),
+		scene->add_texture(Image2d::from_file("res/metal_rusty_ao.jpg", true))
 	});
 
 	scene->point_lights.add({

@@ -110,6 +110,8 @@ class OpenGLWindow : public Window
 
 		std::snprintf(message, BUFSIZ, "%s (%d) of %s severity, raised from %s: %s\n", _type, id, _severity, _source, msg);
 
+		if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
+			__debugbreak();
 		std::clog << message << '\n';
 	}
 	static CreationHints create_hints()

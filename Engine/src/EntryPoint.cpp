@@ -18,7 +18,7 @@ int main()
 	WindowManager::set_swap_interval(1);
 	stbi_set_flip_vertically_on_load(true);
 
-	const glm::vec3 ambient{ 0.2f, 0.3f, 0.3f };
+	const glm::vec3 ambient{ 0.02f, 0.03f, 0.03f };
 	const float depth_clear{ 1.0f };
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
