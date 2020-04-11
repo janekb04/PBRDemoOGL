@@ -18,7 +18,7 @@ int main()
 	WindowManager::set_swap_interval(1);
 	stbi_set_flip_vertically_on_load(true);
 
-	const glm::vec3 ambient{ 0.02f, 0.03f, 0.03f };
+	const glm::vec3 ambient = 0.05f * glm::vec4{ 0.7490f, 0.9765f, 1.0f, 0.0f };
 	const float depth_clear{ 1.0f };
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -30,7 +30,7 @@ int main()
 	};
     
 	//DemoScene scene;
-	auto scene = create_test_scene(1000);
+	auto scene = create_test_scene(1);
 
 	PerspectiveCamera camera;
 	Uniform a_camera = lit.get_uniform_location("a_camera");
