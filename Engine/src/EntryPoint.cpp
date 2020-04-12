@@ -9,11 +9,13 @@
 #include "OpenGLWindow.h"
 #include "OrbitCamera.h"
 #include "TestScene.h"
+#include "GUI.h"
 
 int main()
 {
     WindowManager::init();
 	OpenGLWindow wnd;
+	GUI::init_imgui(wnd.get_context());
 
 	WindowManager::set_swap_interval(1);
 	stbi_set_flip_vertically_on_load(true);
@@ -42,42 +44,37 @@ int main()
 	double old_time = WindowManager::get_time();
 	double delta_time = 1;
 	unsigned long long frame = 0;
-    while (!wnd.should_close())
-    {
-		try 
-		{
-			glClearBufferfv(GL_COLOR, 0, &(RGBtoSRGB(ambient)[0]));
-			glClearBufferfv(GL_DEPTH, 0, &depth_clear);
-	
-			if (frame % 60 == 0)
-			{
-				std::cout << 1/delta_time << '\n';
-			}
-	
-			controller.update(wnd, delta_time);
-	
-			//draw
-			{
-				lit.use();
-				auto view = camera.get_view_matrix();
-				lit.uniform(a_camera, false, camera.get_projection_matrix(wnd.viewport()) * view);
-				lit.uniform(a_camera_pos, camera.transform.get_position());
+	while (!wnd.should_close())
+	{
+		glClearBufferfv(GL_COLOR, 0, &(RGBtoSRGB(ambient)[0]));
+		glClearBufferfv(GL_DEPTH, 0, &depth_clear);
 
-				scene->setup_state();
-				scene->draw();
-			}
-	
-			wnd.end_frame();
-	        WindowManager::poll_events();
-	
-			double new_time = WindowManager::get_time();
-			delta_time = new_time - old_time;
-			old_time = new_time;
-			++frame;
-		}
-		catch (std::exception& e)
+		if (frame % 60 == 0)
 		{
-			std::cerr << e.what() << '\n';
+			std::cout << 1 / delta_time << '\n';
 		}
+
+		controller.update(wnd, delta_time);
+
+		//draw
+		{
+			lit.use();
+			auto view = camera.get_view_matrix();
+			lit.uniform(a_camera, false, camera.get_projection_matrix(wnd.viewport()) * view);
+			lit.uniform(a_camera_pos, camera.transform.get_position());
+
+			scene->setup_state();
+			scene->draw();
+		}
+
+		GUI::render_imgui();
+
+		wnd.end_frame();
+		WindowManager::poll_events();
+
+		double new_time = WindowManager::get_time();
+		delta_time = new_time - old_time;
+		old_time = new_time;
+		++frame;
 	}
 }
