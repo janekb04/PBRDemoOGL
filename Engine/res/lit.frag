@@ -107,6 +107,7 @@ vec3 F(float h_dot_v, vec3 albedo, float metallic)
 	return F_Schlick(h_dot_v, f0);
 }
 
+//Lighting using Cook-Torrance BRDF
 vec3 f_lit(vec3 light_dir, vec3 light_radiance, vec3 normal, vec3 view_dir, vec3 albedo, float metallic, float roughness)
 {
 	vec3 halfway = normalize(view_dir + light_dir);
@@ -126,7 +127,9 @@ vec3 f_lit(vec3 light_dir, vec3 light_radiance, vec3 normal, vec3 view_dir, vec3
 	vec3 specular = ndf * g * f / max(normalization_factor, 0.001);
 	vec3 diffuse = kD * albedo / PI;
 
-	return (diffuse + specular) * light_radiance * n_dot_l;
+	vec3 BRDF = diffuse + specular;
+
+	return BRDF * light_radiance * n_dot_l;
 }
 
 float f_attentuation(vec3 r)
