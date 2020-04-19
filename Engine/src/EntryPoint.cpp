@@ -23,7 +23,7 @@ int main()
 
 	const glm::vec3 ambient = 0.05f * glm::vec4{ 0.7490f, 0.9765f, 1.0f, 0.0f };
 	const float depth_clear{ 1.0f };
-	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST); // <-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glClearColor(0, 0, 0, 1);
@@ -96,7 +96,6 @@ int main()
 			scene->draw();
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glClear(GL_COLOR_BUFFER_BIT);
 
 			deffered.use();
 			deffered.uniform(deffered_camera_pos, camera.transform.get_position());
