@@ -169,7 +169,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\lit.frag" />
-    <None Include="res\lit.vert" />
+    <None Include="res\shaders\lit.frag" />
+    <None Include="res\shaders\lit.vert" />
   </ItemGroup>
 </Project>

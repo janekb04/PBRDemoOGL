@@ -27,8 +27,8 @@ int main()
 	glCullFace(GL_BACK);
 
     ShaderProgram lit{
-		Shader{read_file("res/lit.vert").c_str(), GL_VERTEX_SHADER},
-		Shader{read_file("res/lit.frag").c_str(), GL_FRAGMENT_SHADER}
+		Shader{read_file("res/shaders/lit.vert").c_str(), GL_VERTEX_SHADER},
+		Shader{read_file("res/shaders/lit.frag").c_str(), GL_FRAGMENT_SHADER}
 	};
     
 	//DemoScene scene;

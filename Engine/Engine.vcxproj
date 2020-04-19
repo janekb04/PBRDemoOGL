@@ -65,10 +65,10 @@
     <ClCompile Include="src\stb_image_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\lit.frag">
+    <None Include="res\shaders\lit.frag">
       <FileType>Document</FileType>
     </None>
-    <None Include="res\lit.vert">
+    <None Include="res\shaders\lit.vert">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

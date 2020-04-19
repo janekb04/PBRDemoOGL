@@ -6,7 +6,7 @@
 std::unique_ptr<Scene> create_test_scene(int obj_count)
 {
 	std::vector<Mesh> meshes{
-			Mesh::from_file("res/Cerberus_LP.FBX"),
+			Mesh::from_file("res/meshes/Cerberus_LP.FBX"),
 	};
 
 	std::vector<Scene::PointLight> point_lights;
@@ -29,11 +29,11 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 	//	scene->add_texture(Image2d::from_file("res/metal_rusty_ao.jpg", true))
 	//});
 	scene->materials.add({
-		scene->add_texture(Image2d::from_file("res/Cerberus_A.tga", true)),
-		scene->add_texture(Image2d::from_file("res/Cerberus_N.tga", false)),
-		scene->add_texture(Image2d::from_file("res/Cerberus_M.tga", true)),
-		scene->add_texture(Image2d::from_file("res/Cerberus_R.tga", true)),
-		scene->add_texture(Image2d::from_file("res/white.png", true))
+		scene->add_texture(Image2d::from_file("res/textures/Cerberus_A.tga", true)),
+		scene->add_texture(Image2d::from_file("res/textures/Cerberus_N.tga", false)),
+		scene->add_texture(Image2d::from_file("res/textures/Cerberus_M.tga", true)),
+		scene->add_texture(Image2d::from_file("res/textures/Cerberus_R.tga", true)),
+		scene->add_texture(Image2d::from_file("res/textures/white.png", true))
 		});
 
 	scene->directional_lights.add({
