@@ -49,4 +49,9 @@ public:
 	{
 		return m_height;
 	}
+
+	const Texture2dArray& get_texture() const
+	{
+		return attachments;
+	}
 };

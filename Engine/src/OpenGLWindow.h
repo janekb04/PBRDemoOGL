@@ -3,6 +3,7 @@
 #include "Vendor.h"
 #include "Window.h"
 #include "Viewport.h"
+#include "Event.h"
 
 //window with opengl context
 class OpenGLWindow : public Window
@@ -111,7 +112,7 @@ class OpenGLWindow : public Window
 		std::snprintf(message, BUFSIZ, "%s (%d) of %s severity, raised from %s: %s\n", _type, id, _severity, _source, msg);
 
 		if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
-			__debugbreak();
+			//__debugbreak();
 		std::clog << message << '\n';
 	}
 	static CreationHints create_hints()
@@ -128,10 +129,11 @@ class OpenGLWindow : public Window
 private:
 	double scroll;
 	double cursor_x, cursor_y;
+	Event<int, int> m_on_framebuffer_size;
 protected:
 	virtual void framebuffer_size_callback(int width, int height) override 
 	{
-		glViewport(0, 0, width, height);
+		m_on_framebuffer_size(width, height);
 	}
 	virtual void scroll_callback(double xoffset, double yoffset) override
 	{
@@ -178,5 +180,10 @@ public:
 	{
 		auto [new_x, new_y] = get_cursor_position();
 		return { new_x - cursor_x, new_y - cursor_y };
+	}
+
+	const Event<int, int>& on_framebuffer_size() const 
+	{
+		return m_on_framebuffer_size;
 	}
 };

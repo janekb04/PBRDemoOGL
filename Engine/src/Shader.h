@@ -102,6 +102,11 @@ public:
 		glProgramUniform3fv(handle, uniform.index(), 1, &vec.x);
 	}
 
+	void uniform(Uniform uniform, const glm::uvec2& vec) const
+	{
+		glProgramUniform2uiv(handle, uniform.index(), 1, &vec.x);
+	}
+
 	VertexAttribute get_attrib_location(const char* const name)
 	{
 		int location = glGetAttribLocation(handle, name);

@@ -175,8 +175,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\lit.frag" />
-    <None Include="res\shaders\lit.vert" />
     <None Include="res\shaders\deffered.frag" />
+    <None Include="res\shaders\gbuffer.vert" />
+    <None Include="res\shaders\gbuffer.frag" />
+    <None Include="res\shaders\fullscreen_triangle.vert" />
   </ItemGroup>
 </Project>

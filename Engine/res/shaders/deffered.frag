@@ -11,15 +11,6 @@ struct Fragment
 	float ao;
 };
 
-struct Material
-{
-	uvec2 albedo_idx;
-	uvec2 normal_idx;
-	uvec2 metalic_idx;
-	uvec2 roughness_idx;
-	uvec2 ao_idx;
-};
-
 struct PointLight
 {
 	vec4 pos;
@@ -39,9 +30,11 @@ struct Spotlight
 	float cos_outer_angle;
 };
 
+in vec2 v_uv;
+
 out vec4 f_color;
 
-uniform sampler2DArray a_gbuffer;
+uniform uvec2 a_gbuffer_idx;
 uniform vec3 a_camera_pos;
 uniform vec3 a_ambient;
 
@@ -224,11 +217,11 @@ vec3 tonemapper(vec3 color)
 	//return reinhard(color);
 }
 
-Fragment get_fragment_data_from_gbuffer(vec2 uv)
+Fragment get_fragment_data_from_gbuffer(sampler2DArray gbuffer, vec2 uv)
 {	
-	vec4 v0 = texture(a_gbuffer, vec3(uv, 0));
-	vec4 v1 = texture(a_gbuffer, vec3(uv, 1));
-	vec4 v2 = texture(a_gbuffer, vec3(uv, 2));
+	vec4 v0 = texture(gbuffer, vec3(uv, 0));
+	vec4 v1 = texture(gbuffer, vec3(uv, 1));
+	vec4 v2 = texture(gbuffer, vec3(uv, 2));
 
 	return Fragment(
 		v0.xyz,
@@ -242,7 +235,7 @@ Fragment get_fragment_data_from_gbuffer(vec2 uv)
 
 void main()
 {	
-	Fragment data = get_fragment_data_from_gbuffer();
+	Fragment data = get_fragment_data_from_gbuffer(sampler2DArray(a_gbuffer_idx), v_uv);
 
 	vec3 view_dir = normalize(a_camera_pos - data.pos);
 

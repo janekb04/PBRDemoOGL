@@ -51,6 +51,6 @@ public:
 
 	GLenum check_status(GLenum target)
 	{
-		glCheckNamedFramebufferStatus(handle, target);
+		return glCheckNamedFramebufferStatus(handle, target);
 	}
 };

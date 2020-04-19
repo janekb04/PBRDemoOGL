@@ -15,19 +15,19 @@ private:
 public:
 	using handler_id = typename container_t::iterator;
 public:
-	void operator()(Args&&... args) const
+	void operator()(Args... args)
 	{
 		for (const auto& handler : m_handlers)
 		{
 			handler(std::forward<Args>(args)...);
 		}
 	}
-	handler_id operator+=(const handler_t& handler)
+	handler_id operator+=(const handler_t& handler) const
 	{
 		m_handlers.push_back(handler);
 		return std::prev(m_handlers.end());
 	}
-	void operator-=(handler_id handler)
+	void operator-=(handler_id handler) const
 	{
 		m_handlers.erase(handler);
 	}

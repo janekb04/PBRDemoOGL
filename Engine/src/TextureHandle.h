@@ -17,6 +17,13 @@ public:
 	{
 	}
 
+	operator glm::uvec2() const
+	{
+		glm::uvec2 result;
+		*reinterpret_cast<GLuint64*>(&result) = handle;
+		return result;
+	}
+
 	void make_resident()
 	{
 		glMakeTextureHandleResidentARB(handle);
