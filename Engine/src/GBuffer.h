@@ -33,12 +33,12 @@ public:
 		GLenum attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 		fbo.draw_buffers(3, attachments);
 
-		if (fbo.check_status() != GL_FRAMEBUFFER_COMPLETE)
+		if (fbo.check_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			throw std::runtime_error("framebuffer is not complete");
 	}
 
-	void bind() const
+	void bind(GLenum target) const
 	{
-		fbo.bind();
+		fbo.bind(target);
 	}
 };

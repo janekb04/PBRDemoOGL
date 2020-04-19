@@ -23,6 +23,11 @@ public:
 	{
 	}
 
+	operator GLuint() const
+	{
+		return handle;
+	}
+
 	Buffer(const Buffer&) = delete;
 
 	Buffer(Buffer&& other) :
@@ -60,11 +65,6 @@ public:
 	{
 		if (!glUnmapNamedBuffer(handle))
 			throw std::runtime_error("data store contents have become corrupt during the time the data store was mapped");
-	}
-
-	GLuint get_handle() const
-	{
-		return handle;
 	}
 
 	void bind(GLenum target) const

@@ -36,6 +36,11 @@ public:
 	{
 	}
 
+	operator GLuint() const
+	{
+		return handle;
+	}
+
 	void bind() const
 	{
 		glBindVertexArray(handle);
@@ -43,12 +48,12 @@ public:
 
 	void vertex_buffer(unsigned int binding_index, const Buffer& buffer, ptrdiff_t offset, size_t stride)
 	{
-		glVertexArrayVertexBuffer(handle, binding_index, buffer.get_handle(), offset, stride);
+		glVertexArrayVertexBuffer(handle, binding_index, buffer, offset, stride);
 	}
 
 	void element_buffer(const Buffer& buffer)
 	{
-		glVertexArrayElementBuffer(handle, buffer.get_handle());
+		glVertexArrayElementBuffer(handle, buffer);
 	}
 
 	void enable_attrib(VertexAttribute attribute)
@@ -74,11 +79,6 @@ public:
 	void binding_divisor(unsigned int binding_index, int divisor) const
 	{
 		glVertexArrayBindingDivisor(handle, binding_index, divisor);
-	}
-
-	GLuint get_handle() const
-	{
-		return handle;
 	}
 
 	~VertexArray()

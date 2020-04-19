@@ -33,6 +33,11 @@ public:
 		other.handle = 0;
 	}
 
+	operator GLuint() const
+	{
+		return handle;
+	}
+
 	void storage(unsigned mip_levels, GLenum internal_format, unsigned width, unsigned height) const
 	{
 		glTextureStorage2D(handle, mip_levels, internal_format, width, height);
