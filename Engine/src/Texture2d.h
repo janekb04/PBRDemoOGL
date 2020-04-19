@@ -20,29 +20,32 @@ private:
 	{
 	}
 public:
+	Texture2d() :
+		handle(create_texture())
+	{
+	}
+
 	Texture2d(const Texture2d&) = delete;
-	Texture2d(Texture2d&& other) :
+
+	Texture2d(Texture2d&& other) noexcept:
 		handle(other.handle)
 	{
 		other.handle = 0;
 	}
 
-	Texture2d(const Image2d& image, int mip_levels = 1) :
-		handle(create_texture())
+	void storage(unsigned mip_levels, GLenum internal_format, unsigned width, unsigned height) const
 	{
-		glTextureStorage2D(handle, mip_levels, image.internal_format(), image.width(), image.height());
+		glTextureStorage2D(handle, mip_levels, internal_format, width, height);
+	}
 
-		GLenum formats[]
-		{
-			GL_RED,
-			GL_RG,
-			GL_RGB,
-			GL_RGBA,
-		};
-		glTextureSubImage2D(handle, 0, 0, 0, image.width(), image.height(), formats[image.channels() - 1], GL_UNSIGNED_BYTE, image.data());
+	void sub_image(unsigned mip_level, unsigned xoffset, unsigned yoffset, unsigned width, unsigned height, GLenum format, GLenum type, const void* pixels)
+	{
+		glTextureSubImage2D(handle, mip_level, xoffset, yoffset, width, height, format, type, pixels);
+	}
 
-		if (mip_levels > 1)
-			glGenerateTextureMipmap(handle);
+	void generate_mipmap()
+	{
+		glGenerateTextureMipmap(handle);
 	}
 
 	TextureHandle get_texture_handle() const
@@ -61,3 +64,24 @@ public:
 			glDeleteTextures(1, &handle);
 	}
 };
+
+Texture2d texture2d_from_image(const Image2d& image, unsigned mip_levels = 1)
+{
+	Texture2d texture;
+	
+	texture.storage(mip_levels, image.internal_format(), image.width(), image.height());
+
+	GLenum formats[]
+	{
+		GL_RED,
+		GL_RG,
+		GL_RGB,
+		GL_RGBA,
+	};
+	texture.sub_image(0, 0, 0, image.width(), image.height(), formats[image.channels() - 1], GL_UNSIGNED_BYTE, image.data());
+
+	if (mip_levels > 1)
+		texture.generate_mipmap();
+
+	return texture;
+}

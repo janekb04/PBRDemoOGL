@@ -149,7 +149,20 @@ public:
 public:
 	const TextureHandle add_texture(const Image2d& data)
 	{
-		textures.emplace_back(data, 1 + log2(std::min(data.width(), data.height())));
+		textures.push_back(
+			std::move(
+				texture2d_from_image(
+					data,
+					1 + log2(
+						std::min(
+							data.width(),
+							data.height()
+						)
+					)
+				)
+			)
+		);
+		
 		TextureHandle handle = textures.back().get_texture_handle();
 		handle.make_resident();
 		return handle;

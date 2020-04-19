@@ -16,6 +16,7 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Defines.h" />
     <ClInclude Include="src\Event.h" />
+    <ClInclude Include="src\GBuffer.h" />
     <ClInclude Include="src\GPUArray.h" />
     <ClInclude Include="src\GUI.h" />
     <ClInclude Include="src\Image2d.h" />
