@@ -67,6 +67,7 @@
     <ClCompile Include="src\stb_image_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\deffered.frag" />
     <None Include="res\shaders\lit.frag">
       <FileType>Document</FileType>
     </None>

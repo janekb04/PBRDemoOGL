@@ -2,6 +2,7 @@
 
 #include "Vendor.h"
 #include "Texture2d.h"
+#include "Texture2dArray.h"
 
 class Framebuffer
 {
@@ -41,6 +42,11 @@ public:
 	void texture(GLenum attachment, const Texture2d& texture, unsigned mip_level)
 	{
 		glNamedFramebufferTexture(handle, attachment, texture, mip_level);
+	}
+
+	void texture_layer(GLenum attachment, const Texture2dArray& texture, unsigned mip_level, unsigned layer)
+	{
+		glNamedFramebufferTextureLayer(handle, attachment, texture, mip_level, layer);
 	}
 
 	GLenum check_status(GLenum target)

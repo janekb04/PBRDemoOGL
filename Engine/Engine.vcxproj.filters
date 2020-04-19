@@ -177,5 +177,6 @@
   <ItemGroup>
     <None Include="res\shaders\lit.frag" />
     <None Include="res\shaders\lit.vert" />
+    <None Include="res\shaders\deffered.frag" />
   </ItemGroup>
 </Project>
