@@ -1,35 +1,24 @@
 #pragma once
 
-#include "Vendor.h"
+#include "../Vendor.h"
+#include "GLObject.h"
 #include "Texture2d.h"
 #include "Texture2dArray.h"
 #include "Renderbuffer.h"
 
-class Framebuffer
+class Framebuffer : public GLObject<Framebuffer>
 {
 private:
-	GLuint handle;
-
-	static GLuint create_handle()
+	friend class GLObject<Framebuffer>;
+	static void create(GLsizei count, GLuint* handles)
 	{
-		GLuint handle;
-		glCreateFramebuffers(1, &handle);
-		return handle;
+		glCreateFramebuffers(count, handles);
+	}
+	static void destroy(GLsizei count, GLuint* handles)
+	{
+		glDeleteFramebuffers(count, handles);
 	}
 public:
-	Framebuffer() :
-		handle{ create_handle() }
-	{
-	}
-
-	Framebuffer(const Framebuffer&) = delete;
-
-	Framebuffer(Framebuffer&& other) noexcept:
-		handle(other.handle)
-	{
-		other.handle = 0;
-	}
-
 	void bind(GLenum target) const
 	{
 		glBindFramebuffer(target, handle);

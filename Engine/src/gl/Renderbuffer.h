@@ -1,37 +1,21 @@
 #pragma once
 
-#include "Vendor.h"
+#include "../Vendor.h"
+#include "GLObject.h"
 
-class Renderbuffer
+class Renderbuffer : public GLObject<Renderbuffer>
 {
 private:
-	GLuint handle;
-
-	static GLuint create_handle()
+	friend class GLObject<Renderbuffer>;
+	static void create(GLsizei count, GLuint* handles)
 	{
-		GLuint handle;
-		glCreateRenderbuffers(1, &handle);
-		return handle;
+		glCreateRenderbuffers(count, handles);
+	}
+	static void destroy(GLsizei count, GLuint* handles)
+	{
+		glDeleteRenderbuffers(count, handles);
 	}
 public:
-	Renderbuffer() :
-		handle{ create_handle() }
-	{
-	}
-
-	Renderbuffer(const Renderbuffer&) = delete;
-
-	Renderbuffer(Renderbuffer&& other) noexcept :
-		handle(other.handle)
-	{
-		other.handle = 0;
-	}
-
-	operator GLuint() const
-	{
-		return handle;
-	}
-
 	void storage(GLenum internal_format, unsigned width, unsigned height)
 	{
 		glNamedRenderbufferStorage(handle, internal_format, width, height);

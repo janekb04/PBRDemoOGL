@@ -1,16 +1,19 @@
 #pragma once
-#include "Vendor.h"
 
-class Buffer
+#include "../Vendor.h"
+#include "GLObject.h"
+
+class Buffer : public GLObject<Buffer>
 {
 private:
-	GLuint handle;
-
-	static GLuint create_handle()
+	friend class GLObject<Buffer>;
+	static void create(GLsizei count, GLuint* handles)
 	{
-		GLuint handle;
-		glCreateBuffers(1, &handle);
-		return handle;
+		glCreateBuffers(count, handles);
+	}
+	static void destroy(GLsizei count, GLuint* handles)
+	{
+		glDeleteBuffers(count, handles);
 	}
 public:
 	static void copy_sub_data(const Buffer& source, const Buffer& target, size_t read_offset, size_t write_offset, size_t size)
@@ -18,24 +21,6 @@ public:
 		glCopyNamedBufferSubData(source.handle, target.handle, read_offset, write_offset, size);
 	}
 public:
-	Buffer() :
-		handle{ create_handle() }
-	{
-	}
-
-	operator GLuint() const
-	{
-		return handle;
-	}
-
-	Buffer(const Buffer&) = delete;
-
-	Buffer(Buffer&& other) :
-		handle(other.handle)
-	{
-		other.handle = 0;
-	}
-
 	void data(size_t size, const void* data, GLenum usage)
 	{
 		glNamedBufferData(handle, size, data, usage);
@@ -75,15 +60,5 @@ public:
 	void bind_base(GLenum target, unsigned index) const
 	{
 		glBindBufferBase(target, index, handle);
-	}
-	
-	bool is_null() const
-	{
-		return handle == 0;
-	}
-
-	~Buffer()
-	{
-		glDeleteBuffers(1, &handle);
 	}
 };

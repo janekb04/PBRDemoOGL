@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Vendor.h"
+#include "../Vendor.h"
+#include "GLObject.h"
 #include "Buffer.h"
 
 class VertexAttribute
@@ -19,28 +20,19 @@ public:
 	}
 };
 
-class VertexArray
+class VertexArray : public GLObject<VertexArray>
 {
 private:
-	GLuint handle;
-
-	static GLuint create_handle()
+	friend class GLObject<VertexArray>;
+	static void create(GLsizei count, GLuint* handles)
 	{
-		GLuint handle;
-		glCreateVertexArrays(1, &handle);
-		return handle;
+		glCreateVertexArrays(count, handles);
+	}
+	static void destroy(GLsizei count, GLuint* handles)
+	{
+		glDeleteVertexArrays(count, handles);
 	}
 public:
-	VertexArray() :
-		handle{ create_handle() }
-	{
-	}
-
-	operator GLuint() const
-	{
-		return handle;
-	}
-
 	void bind() const
 	{
 		glBindVertexArray(handle);
@@ -79,10 +71,5 @@ public:
 	void binding_divisor(unsigned int binding_index, int divisor) const
 	{
 		glVertexArrayBindingDivisor(handle, binding_index, divisor);
-	}
-
-	~VertexArray()
-	{
-		glDeleteVertexArrays(1, &handle);
 	}
 };
