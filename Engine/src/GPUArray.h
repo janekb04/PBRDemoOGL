@@ -2,7 +2,7 @@
 
 #include "Vendor.h"
 #include "Utility.h"
-#include "Buffer.h"
+#include "gl/Buffer.h"
 
 template <typename T>
 class GPUArray

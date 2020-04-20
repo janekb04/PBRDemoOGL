@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Vendor.h"
-#include "Buffer.h"
-#include "VertexArray.h"
+#include "gl/Buffer.h"
+#include "gl/VertexArray.h"
 #include "MultiDrawBuilder.h"
 #include "Vertex.h"
 #include "Mesh.h"
@@ -10,7 +10,7 @@
 #include "UnorderedArraySet.h"
 #include "MappedGPUArray.h"
 #include "Utility.h"
-#include "Texture2d.h"
+#include "gl/Texture2d.h"
 #include "BufferArray.h"
 
 class Scene

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Vendor.h"
-#include "Buffer.h"
+#include "gl/Buffer.h"
 
 template <typename T>
 class BufferArray

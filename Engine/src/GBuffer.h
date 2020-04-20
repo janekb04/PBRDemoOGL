@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Vendor.h"
-#include "Framebuffer.h"
-#include "Texture2dArray.h"
+#include "gl/Framebuffer.h"
+#include "gl/Texture2dArray.h"
 
 // Format
 //  Attachment        x        y        z         w  
