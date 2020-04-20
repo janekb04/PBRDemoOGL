@@ -7,6 +7,10 @@ class GLObject
 {
 protected:
 	GLuint handle;
+	GLObject(GLuint _handle) :
+		handle{ _handle }
+	{
+	}
 private:
 	static GLuint create_handle()
 	{
