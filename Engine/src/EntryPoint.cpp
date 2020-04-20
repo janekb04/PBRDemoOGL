@@ -23,7 +23,7 @@ int main()
 
 	const glm::vec3 ambient = 0.05f * glm::vec4{ 0.7490f, 0.9765f, 1.0f, 0.0f };
 	const float depth_clear{ 1.0f };
-	glDisable(GL_DEPTH_TEST); // <-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glClearColor(0, 0, 0, 1);
@@ -86,22 +86,23 @@ int main()
 		auto view = camera.get_view_matrix();
 		//draw
 		{
+			scene->setup_state();
+
 			gbuffer_prog.use();
 			gbuffer_prog.uniform(gbuffer_camera, false, camera.get_projection_matrix(wnd.viewport()) * view);
 			
 			gbuffer->bind(GL_FRAMEBUFFER);
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			scene->setup_state();
 			scene->draw();
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glClear(GL_DEPTH_BUFFER_BIT);
 
 			deffered.use();
 			deffered.uniform(deffered_camera_pos, camera.transform.get_position());
 			deffered.uniform(deffered_ambient, ambient);
 
-			scene->setup_state();
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 

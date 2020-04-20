@@ -3,6 +3,7 @@
 #include "Vendor.h"
 #include "Texture2d.h"
 #include "Texture2dArray.h"
+#include "Renderbuffer.h"
 
 class Framebuffer
 {
@@ -23,7 +24,7 @@ public:
 
 	Framebuffer(const Framebuffer&) = delete;
 
-	Framebuffer(Framebuffer&& other) :
+	Framebuffer(Framebuffer&& other) noexcept:
 		handle(other.handle)
 	{
 		other.handle = 0;
@@ -47,6 +48,11 @@ public:
 	void texture_layer(GLenum attachment, const Texture2dArray& texture, unsigned mip_level, unsigned layer)
 	{
 		glNamedFramebufferTextureLayer(handle, attachment, texture, mip_level, layer);
+	}
+
+	void renderbuffer(GLenum attachment, GLenum renderbuffer_target, const Renderbuffer& rbo)
+	{
+		glNamedFramebufferRenderbuffer(handle, attachment, renderbuffer_target, rbo);
 	}
 
 	GLenum check_status(GLenum target)
