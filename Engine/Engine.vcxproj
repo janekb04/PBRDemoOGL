@@ -11,9 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\gl\Buffer.h" />
     <ClInclude Include="src\BufferArray.h" />
-    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\gl\ImageHandle.h" />
+    <ClInclude Include="src\Viewer.h" />
     <ClInclude Include="src\Defines.h" />
     <ClInclude Include="src\Event.h" />
     <ClInclude Include="src\gl\Framebuffer.h" />
@@ -68,6 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\deffered.frag" />
+    <None Include="res\shaders\deffered.comp" />
+    <None Include="res\shaders\draw_to_framebuffer.frag" />
     <None Include="res\shaders\fullscreen_triangle.vert" />
     <None Include="res\shaders\gbuffer.frag">
       <FileType>Document</FileType>

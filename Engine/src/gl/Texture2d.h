@@ -3,6 +3,7 @@
 #include "../Vendor.h"
 #include "GLObject.h"
 #include "TextureHandle.h"
+#include "ImageHandle.h"
 
 class Texture2d : public GLObject<Texture2d>
 {
@@ -22,6 +23,7 @@ private:
 	{
 	}
 public:
+	Texture2d() = default;
 	static Texture2d view(GLenum target, const Texture2d& original, GLenum internal_format, unsigned first_mip_level, unsigned mip_level_count, unsigned first_layer, unsigned layer_count)
 	{
 		GLuint handle;
@@ -48,6 +50,11 @@ public:
 	TextureHandle get_texture_handle() const
 	{
 		return TextureHandle(glGetTextureHandleARB(handle));
+	}
+
+	ImageHandle get_image_handle(unsigned level, bool layered, unsigned layer, GLenum format) const
+	{
+		return ImageHandle(glGetImageHandleARB(handle, level, layered, layer, format));
 	}
 
 	void bind() const

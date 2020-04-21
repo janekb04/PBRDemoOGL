@@ -117,7 +117,7 @@ public:
 	Uniform get_uniform_location(const char* const name)
 	{
 		int location = glGetUniformLocation(handle, name);
-		assert(location != -1);
+		//assert(location != -1);
 		return Uniform{ static_cast<unsigned int>(location) };
 	}
 

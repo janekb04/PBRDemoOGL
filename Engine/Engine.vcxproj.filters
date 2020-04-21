@@ -54,9 +54,6 @@
     <ClInclude Include="src\MultiDrawBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Index.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -147,6 +144,15 @@
     <ClInclude Include="src\gl\GLObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Viewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gl\ImageHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\imgui\imgui.cpp">
@@ -179,5 +185,7 @@
     <None Include="res\shaders\gbuffer.vert" />
     <None Include="res\shaders\gbuffer.frag" />
     <None Include="res\shaders\fullscreen_triangle.vert" />
+    <None Include="res\shaders\deffered.comp" />
+    <None Include="res\shaders\draw_to_framebuffer.frag" />
   </ItemGroup>
 </Project>

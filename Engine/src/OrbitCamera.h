@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Camera.h"
 #include "OpenGLWindow.h"
 #include "Utility.h"
 
