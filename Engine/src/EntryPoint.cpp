@@ -59,35 +59,36 @@ int main()
 
 	int width = 0, height = 0;
 	bool show_ui = true;
+	bool render = true;
 	double old_time = WindowManager::get_time();
 	double delta_time = 1;
 	unsigned long long frame = 0;
 	while (!wnd.should_close())
 	{
 		//Check if window got resized
+		auto [new_width, new_height] = wnd.get_framebuffer_size();
+		if (new_width == 0 || new_height == 0)
+			render = false;
+		if ((width != new_width || height != new_height) && render)
 		{
-			auto [new_width, new_height] = wnd.get_framebuffer_size();
-			if (width != new_width || height != new_height)
-			{
-				width = new_width;
-				height = new_height;
+			width = new_width;
+			height = new_height;
 
-				gbuffer = std::make_unique<GBuffer>(width, height);
-				auto gbuffer_texture_handle = gbuffer->get_texture().get_texture_handle();
-				gbuffer_texture_handle.make_resident();
-				deffered.uniform(deffered_gbuffer_idx, (glm::uvec2)gbuffer_texture_handle);
+			gbuffer = std::make_unique<GBuffer>(width, height);
+			auto gbuffer_texture_handle = gbuffer->get_texture().get_texture_handle();
+			gbuffer_texture_handle.make_resident();
+			deffered.uniform(deffered_gbuffer_idx, (glm::uvec2)gbuffer_texture_handle);
 
-				output = std::make_unique<Texture2d>();
-				output->storage(1, GL_RGBA16F, width, height);
-				auto output_image_handle = output->get_image_handle(0, false, 0, GL_RGBA16F);
-				output_image_handle.make_resident(GL_WRITE_ONLY);
-				deffered.uniform(deffered_output_idx, output_image_handle);
-				auto output_texture_handle = output->get_texture_handle();
-				output_texture_handle.make_resident();
-				draw_to_screen.uniform(draw_to_screen_input_idx, output_texture_handle);
+			output = std::make_unique<Texture2d>();
+			output->storage(1, GL_RGBA16F, width, height);
+			auto output_image_handle = output->get_image_handle(0, false, 0, GL_RGBA16F);
+			output_image_handle.make_resident(GL_WRITE_ONLY);
+			deffered.uniform(deffered_output_idx, output_image_handle);
+			auto output_texture_handle = output->get_texture_handle();
+			output_texture_handle.make_resident();
+			draw_to_screen.uniform(draw_to_screen_input_idx, output_texture_handle);
 
-				glViewport(0, 0, width, height);
-			}
+			glViewport(0, 0, width, height);
 		}
 
 		if (frame % 60 == 0)
@@ -100,12 +101,13 @@ int main()
 			show_ui = !show_ui;
 
 		//draw
-		{	
+		if (render)
+		{
 			scene->setup_state();
 
 			gbuffer_prog.use();
 			gbuffer_prog.uniform(gbuffer_camera, false, camera.viewer->get_projection_matrix(wnd.viewport()) * camera.viewer->get_view_matrix(camera.transform));
-			
+
 			gbuffer->bind(GL_FRAMEBUFFER);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -138,5 +140,6 @@ int main()
 		delta_time = new_time - old_time;
 		old_time = new_time;
 		++frame;
+		render = true;
 	}
 }

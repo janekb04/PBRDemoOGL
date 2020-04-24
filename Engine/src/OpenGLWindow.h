@@ -132,7 +132,7 @@ class OpenGLWindow : public Window
 		Window::Options options;
 		options.width = 1920;
 		options.height = 1080;
-		options.monitor = Monitor::get_primary_monitor();
+		//options.monitor = Monitor::get_primary_monitor();
         return options;
 	}
 private:

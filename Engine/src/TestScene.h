@@ -60,7 +60,84 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 		scene->add_model(i % meshes.size(), model);
 	}
 
-	GUI::on_gui_render += [] {ImGui::ShowDemoWindow(); };
+	GUI::on_gui_render += std::bind([](Scene* scene) {
+
+		if (ImGui::Begin("Settings"))
+		{
+			if (ImGui::TreeNode("Directional lights"))
+			{
+				for (int i = 0; i < scene->directional_lights.size(); ++i)
+				{
+					ImGui::PushID(&scene->directional_lights + i);
+					if (ImGui::TreeNode("%i", std::to_string(i).c_str()))
+					{
+						Scene::DirectionalLight light = scene->directional_lights.get(i);
+					
+						ImGui::DragFloat3("Direction", &light.direction[0], 0.1f, -1, 1);
+						light.direction = glm::normalize(light.direction);
+
+						ColorEdit3HDR(&light.color[0]);
+
+						scene->directional_lights.set(i, light);
+
+						ImGui::TreePop();
+					}
+					ImGui::PopID();
+				}
+				if (scene->directional_lights.size() < scene->directional_lights.capacity())
+				{
+					if (ImGui::Button("Add light"))
+					{
+						scene->directional_lights.add(Scene::DirectionalLight{
+								glm::vec4(0, 1, 0, 0),
+								glm::vec4(0.001, 0.001, 0.001, 0)
+						});
+					}
+				}
+				else
+				{
+					ImGui::Text("Maximum amount of lights reached");
+				}
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("Point lights"))
+			{
+				for (int i = 0; i < scene->point_lights.size(); ++i)
+				{
+					ImGui::PushID(&scene->point_lights + i);
+					if (ImGui::TreeNode("%i", std::to_string(i).c_str()))
+					{
+						Scene::PointLight light = scene->point_lights.get(i);
+
+						ImGui::DragFloat3("Position", &light.pos[0], 0.1f, 0, 0);
+
+						ColorEdit3HDR(&light.color[0]);
+
+						scene->point_lights.set(i, light);
+
+						ImGui::TreePop();
+					}
+					ImGui::PopID();
+				}
+				if (scene->point_lights.size() < scene->point_lights.capacity())
+				{
+					if (ImGui::Button("Add light"))
+					{
+						scene->point_lights.add(Scene::PointLight{
+							glm::vec4(0, 0, 0, 0),
+							glm::vec4(0.001, 0.001, 0.001, 0)
+						});
+					}
+				}
+				else
+				{
+					ImGui::Text("Maximum amount of lights reached");
+				}
+				ImGui::TreePop();
+			}
+		}
+		ImGui::End();
+	}, scene.get());
 
 	return scene;
 }

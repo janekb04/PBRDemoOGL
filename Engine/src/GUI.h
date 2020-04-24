@@ -46,3 +46,18 @@ namespace GUI
 		ImGui_ImplOpenGL3_Init();
 	}
 }
+
+bool ColorEdit3HDR(float raw_color[3])
+{
+	glm::vec3& color = *reinterpret_cast<glm::vec3*>(raw_color);
+	
+	float brightness = glm::length(color);
+	glm::vec3 _color = glm::normalize(color);
+	bool edited;
+	edited = ImGui::ColorEdit3("Color", &_color[0], ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR);
+	edited |= ImGui::DragFloat("Brightness", &brightness, 1, 0.001, std::numeric_limits<float>::infinity());
+	if (brightness < 0.001)
+		brightness = 0.001;
+	color = glm::normalize(_color) * brightness;
+	return edited;
+}
