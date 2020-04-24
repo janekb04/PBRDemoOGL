@@ -16,10 +16,16 @@ public:
 		handle(nullptr)
 	{
 	}
-	Monitor(Monitor&& other) :
+	Monitor(Monitor&& other) noexcept:
 		handle(other.handle)
 	{
 		other.handle = nullptr;
+	}
+	Monitor& operator=(Monitor&& other)
+	{
+		handle = other.handle;
+		other.handle = nullptr;
+		return *this;
 	}
 public: //static
 	static Monitor get_primary_monitor()

@@ -8,8 +8,8 @@ class OrbitCamera
 private:
     float lookSpeedH = 400;
     float lookSpeedV = 400;
-    float zoomSpeed = 0.5;
-    float dragSpeed = 70000;
+    float zoomSpeed = 0.7;
+    float dragSpeed = 170000;
     float exponent = 2;
 
     float yaw = 0;

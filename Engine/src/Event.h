@@ -22,12 +22,12 @@ public:
 			handler(std::forward<Args>(args)...);
 		}
 	}
-	handler_id operator+=(const handler_t& handler) const
+	handler_id operator+=(const handler_t& handler)
 	{
 		m_handlers.push_back(handler);
 		return std::prev(m_handlers.end());
 	}
-	void operator-=(handler_id handler) const
+	void operator-=(handler_id handler)
 	{
 		m_handlers.erase(handler);
 	}

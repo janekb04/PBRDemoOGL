@@ -19,7 +19,7 @@ int main()
 	OpenGLWindow wnd;
 	GUI::init_imgui(wnd.get_context());
 
-	WindowManager::set_swap_interval(0);
+	WindowManager::set_swap_interval(1);
 	stbi_set_flip_vertically_on_load(true);
 
 	const glm::vec3 ambient = 0.05f * glm::vec4{ 0.7490f, 0.9765f, 1.0f, 0.0f };
@@ -58,6 +58,7 @@ int main()
 	std::unique_ptr<Texture2d> output;
 
 	int width = 0, height = 0;
+	bool show_ui = true;
 	double old_time = WindowManager::get_time();
 	double delta_time = 1;
 	unsigned long long frame = 0;
@@ -91,10 +92,12 @@ int main()
 
 		if (frame % 60 == 0)
 		{
-			std::cout << 1 / delta_time << '\n';
+			std::cout << "FPS: " << 1 / delta_time << '\n';
 		}
 
 		controller.update(wnd, delta_time);
+		if (wnd.is_key_pressed(GLFW_KEY_F1))
+			show_ui = !show_ui;
 
 		//draw
 		{	
@@ -125,7 +128,8 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 
-		GUI::render_imgui();
+		if (show_ui)
+			GUI::render_imgui();
 
 		wnd.end_frame();
 		WindowManager::poll_events();

@@ -5,7 +5,7 @@
 #include "Viewport.h"
 #include "Event.h"
 
-//window with opengl context
+//window with OpenGL context
 class OpenGLWindow : public Window
 {
 	static void APIENTRY opengl_error_callback(
@@ -121,10 +121,19 @@ class OpenGLWindow : public Window
 		hints.context_version_major = 4;
 		hints.context_version_minor = 6;
 		hints.opengl_profile = Window::OpenGLProfile::CORE;
+		hints.decorated = false;
 #ifndef NDEBUG
 		hints.opengl_debug_context = true;
 #endif // !NDEBUG
 		return hints;
+	}
+	static Options create_options()
+	{
+		Window::Options options;
+		options.width = 1920;
+		options.height = 1080;
+		options.monitor = Monitor::get_primary_monitor();
+        return options;
 	}
 private:
 	double scroll;
@@ -141,7 +150,7 @@ protected:
 	}
 public:
 	OpenGLWindow() : 
-		Window({}, create_hints())
+		Window(create_options(), create_hints())
 	{
 		get_context().make_current();
 

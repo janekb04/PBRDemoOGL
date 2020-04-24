@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+#include "GUI.h"
 #include <memory>
 
 std::unique_ptr<Scene> create_test_scene(int obj_count)
@@ -17,8 +18,8 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 		obj_count,
 		1,
 		4,
-		1,
-		1
+		4,
+		4
 	);
 
 	//scene->materials.add({
@@ -34,11 +35,15 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 		scene->add_texture(Image2d::from_file("res/textures/Cerberus_M.tga", true)),
 		scene->add_texture(Image2d::from_file("res/textures/Cerberus_R.tga", true)),
 		scene->add_texture(Image2d::from_file("res/textures/white.png", true))
-		});
+	});
 
 	scene->directional_lights.add({
-		glm::normalize(glm::vec4{0.1, .9, 0.3, 0}),
-		20.0f * glm::vec4{0.9294, 0.8196, 0.5216, 0}
+		glm::normalize(glm::vec4{-0.4, .9, 0.3, 0}),
+		50.0f * glm::vec4{1, 0.2, 0.2, 0}
+	});
+	scene->directional_lights.add({
+	glm::normalize(glm::vec4{0.4, .9, 0.3, 0}),
+		50.0f * glm::vec4{0.2, 0.2, 1, 0}
 	});
 
 	unsigned side_length = ceil(cbrt(obj_count));
@@ -46,13 +51,16 @@ std::unique_ptr<Scene> create_test_scene(int obj_count)
 	for (int i = 0; i < obj_count; ++i)
 	{
 		Scene::Model model;
-		model.model_transform = glm::rotate(glm::mat4(1), glm::radians(90.0f), glm::vec3(0, 0, 1));
+		model.model_transform = glm::translate(glm::mat4(1), glm::vec3(0, 0, i * 50));
+		model.model_transform = glm::rotate(model.model_transform, glm::radians(90.0f), glm::vec3(0, 0, 1));
 		model.model_transform = glm::rotate(model.model_transform, glm::radians(90.0f), glm::vec3(0, 1, 0));
 		model.material_idx = rand() % scene->materials.size();
 		model.normal_mat = glm::mat3(glm::transpose(glm::inverse(model.model_transform)));
 
 		scene->add_model(i % meshes.size(), model);
 	}
+
+	GUI::on_gui_render += [] {ImGui::ShowDemoWindow(); };
 
 	return scene;
 }
